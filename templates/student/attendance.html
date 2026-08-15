@@ -1,0 +1,52 @@
+{% extends "student/_layout.html" %}
+{% block student_title %}الحضور والغياب{% endblock %}
+{% block student_content %}
+<div class="page-header">
+  <h2><i class="bi bi-check2-square"></i> سجل الحضور</h2>
+</div>
+
+{% if records %}
+  {% set present = records|selectattr('status', 'equalto', 'حاضر')|list|length %}
+  {% set absent = records|selectattr('status', 'equalto', 'غائب')|list|length %}
+  {% set late = records|selectattr('status', 'equalto', 'متأخر')|list|length %}
+  {% set rate = (present / records|length * 100) if records else 0 %}
+
+  <div class="row g-3 mb-3">
+    <div class="col-3"><div class="student-stat"><i class="bi bi-check2 text-success"></i><strong>{{ present }}</strong><small>حاضر</small></div></div>
+    <div class="col-3"><div class="student-stat"><i class="bi bi-x text-danger"></i><strong>{{ absent }}</strong><small>غائب</small></div></div>
+    <div class="col-3"><div class="student-stat"><i class="bi bi-clock text-warning"></i><strong>{{ late }}</strong><small>متأخر</small></div></div>
+    <div class="col-3"><div class="student-stat"><i class="bi bi-percent text-info"></i><strong>{{ rate|round(0) }}%</strong><small>نسبة الحضور</small></div></div>
+  </div>
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>التاريخ</th>
+            <th>الموضوع</th>
+            <th>الحالة</th>
+            <th>ملاحظة</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in records %}
+            <tr>
+              <td>{{ a.session.session_date }}</td>
+              <td>{{ a.session.topic or '—' }}</td>
+              <td>
+                <span class="badge bg-{{ 'success' if a.status == 'حاضر' else 'danger' if a.status == 'غائب' else 'warning' if a.status == 'متأخر' else 'info' }}">
+                  {{ a.status }}
+                </span>
+              </td>
+              <td><small>{{ a.notes or '—' }}</small></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% else %}
+  <div class="alert alert-info text-center">مفيش سجلات حضور لسه</div>
+{% endif %}
+{% endblock %}

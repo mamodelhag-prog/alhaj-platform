@@ -1,0 +1,190 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}المدفوعات{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-cash-coin"></i> المدفوعات والمستحقات</h2>
+    <p class="text-muted">إدارة رسوم الطلاب الشهرية</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPayModal">
+    <i class="bi bi-plus-circle"></i> تسجيل دفعة
+  </button>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <small class="text-muted">إيرادات شهر {{ month }}</small>
+        <h3 class="text-success mb-0">{{ month_total|round(2) }} <small>جنيه</small></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <form method="GET" class="d-flex gap-2 align-items-end">
+      <div>
+        <label class="form-label">عرض شهر</label>
+        <input type="month" name="month" value="{{ month }}" class="form-control">
+      </div>
+      <button class="btn btn-outline-primary"><i class="bi bi-filter"></i> فلتر</button>
+    </form>
+  </div>
+</div>
+
+<div class="card mb-3">
+  <div class="card-header"><i class="bi bi-card-list"></i> مستحقات الطلاب</div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>الطالب</th>
+          <th>المجموعة</th>
+          <th>المتوقع</th>
+          <th>المدفوع</th>
+          <th>المتبقي</th>
+          <th>الحالة</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in students_summary %}
+          <tr>
+            <td>{{ item.student.user.full_name }}</td>
+            <td>{{ item.student.group.name if item.student.group else '—' }}</td>
+            <td>{{ item.expected|round(0) }}</td>
+            <td class="text-success">{{ item.paid|round(0) }}</td>
+            <td>
+              {% if item.remaining > 0 %}
+                <span class="text-danger">{{ item.remaining|round(0) }}</span>
+              {% else %}
+                <span class="text-success">0</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.remaining <= 0 %}
+                <span class="badge bg-success">مكتمل</span>
+              {% elif item.paid == 0 %}
+                <span class="badge bg-danger">غير مدفوع</span>
+              {% else %}
+                <span class="badge bg-warning">جزئي</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if item.student.user.whatsapp %}
+                <a href="https://wa.me/{{ item.student.user.whatsapp|replace('+', '')|replace(' ', '') }}?text=بخصوص مستحقات {{ item.student.user.full_name }}" target="_blank" class="btn btn-sm btn-success">
+                  <i class="bi bi-whatsapp"></i> تذكير
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><i class="bi bi-receipt"></i> سجل المدفوعات</div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>التاريخ</th>
+          <th>الطالب</th>
+          <th>عن شهر</th>
+          <th>المبلغ</th>
+          <th>الطريقة</th>
+          <th>الإيصال</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>{{ p.payment_date }}</td>
+            <td>{{ p.student.user.full_name }}</td>
+            <td>{{ p.for_month or '—' }}</td>
+            <td><strong>{{ p.amount }}</strong> ج</td>
+            <td>{{ p.method }}</td>
+            <td><small>{{ p.receipt_no or '—' }}</small></td>
+            <td>
+              <span class="badge bg-{{ 'success' if p.status == 'مدفوع' else 'warning' if p.status == 'معلق' else 'danger' }}">
+                {{ p.status }}
+              </span>
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('admin_delete_payment', pay_id=p.id) }}" class="d-inline" onsubmit="return confirm('حذف الدفعة؟')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8" class="text-center text-muted py-4">لا يوجد مدفوعات مسجلة</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="addPayModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST">
+        <div class="modal-header"><h5>تسجيل دفعة جديدة</h5></div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">الطالب</label>
+            <select name="student_id" class="form-select" required>
+              <option value="">اختر الطالب</option>
+              {% for s in students %}
+                <option value="{{ s.id }}">{{ s.user.full_name }}{% if s.group %} - {{ s.group.name }}{% endif %}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">المبلغ (جنيه)</label>
+              <input type="number" step="0.01" name="amount" class="form-control" required>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">عن شهر</label>
+              <input type="month" name="for_month" class="form-control" value="{{ month }}">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">طريقة الدفع</label>
+            <select name="method" class="form-select">
+              <option>كاش</option>
+              <option>تحويل بنكي</option>
+              <option>فودافون كاش</option>
+              <option>اتصالات كاش</option>
+              <option>أورانج كاش</option>
+              <option>إنستاباي</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">رقم الإيصال</label>
+            <input type="text" name="receipt_no" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ملاحظات</label>
+            <input type="text" name="notes" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الحالة</label>
+            <select name="status" class="form-select">
+              <option>مدفوع</option>
+              <option>معلق</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">تسجيل</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

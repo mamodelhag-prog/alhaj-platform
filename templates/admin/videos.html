@@ -1,0 +1,90 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}فيديوهات الشرح{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-play-circle"></i> فيديوهات الشرح</h2>
+    <p class="text-muted">رفع فيديوهات الشرح للمجموعات</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVidModal">
+    <i class="bi bi-plus-circle"></i> فيديو جديد
+  </button>
+</div>
+
+<div class="alert alert-info">
+  <i class="bi bi-info-circle"></i>
+  <strong>ملاحظة:</strong> لو الفيديو كبير استخدم رابط يوتيوب خارجي بدل الرفع المباشر. الحد الأقصى للرفع 500MB.
+</div>
+
+<div class="row g-3">
+  {% for v in videos %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card video-card">
+        <div class="card-body">
+          <div class="ratio ratio-16x9 mb-2 bg-light rounded">
+            <video controls preload="metadata" class="rounded">
+              <source src="{{ url_for('serve_upload', filename=v.file_path) }}">
+            </video>
+          </div>
+          <h6>{{ v.title }}</h6>
+          <p class="text-muted small mb-1">{{ v.group.stage.name }} - {{ v.group.name }}</p>
+          {% if v.topic %}<span class="badge bg-secondary">{{ v.topic }}</span>{% endif %}
+          {% if v.duration %}<span class="badge bg-info"><i class="bi bi-clock"></i> {{ v.duration }}</span>{% endif %}
+          <p class="small mt-2">{{ v.description or '' }}</p>
+          <form method="POST" action="{{ url_for('admin_delete_video', vid_id=v.id) }}" onsubmit="return confirm('حذف الفيديو؟')">
+            <button class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-trash"></i> حذف</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12 text-center text-muted py-5">لا يوجد فيديوهات. ارفع أول فيديو.</div>
+  {% endfor %}
+</div>
+
+<div class="modal fade" id="addVidModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" enctype="multipart/form-data">
+        <div class="modal-header"><h5>رفع فيديو جديد</h5></div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">المجموعة</label>
+            <select name="group_id" class="form-select" required>
+              <option value="">اختر</option>
+              {% for g in groups %}
+                <option value="{{ g.id }}">{{ g.stage.name }} - {{ g.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">عنوان الفيديو</label>
+            <input type="text" name="title" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الموضوع</label>
+            <input type="text" name="topic" class="form-control" placeholder="مثال: النحو - كان وأخواتها">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">المدة (اختياري)</label>
+            <input type="text" name="duration" class="form-control" placeholder="مثال: 25:30">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الوصف</label>
+            <textarea name="description" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ملف الفيديو</label>
+            <input type="file" name="video_file" class="form-control" accept="video/*" required>
+            <small class="text-muted">MP4, WebM, MOV - حد أقصى 500MB</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">رفع</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

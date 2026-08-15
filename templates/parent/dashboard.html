@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}لوحة ولي الأمر{% endblock %}
+{% block body %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="brand-text mb-0">أهلاً يا {{ current_user.full_name }}</h2>
+      <p class="text-muted">منصة الحاج في اللغة العربية - لوحة ولي الأمر</p>
+    </div>
+    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+      <i class="bi bi-box-arrow-right"></i> خروج
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="row g-3">
+    {% for child in children %}
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <i class="bi bi-person-circle"></i> {{ child.user.full_name }}
+          </div>
+          <div class="card-body">
+            <p class="mb-1"><strong>المجموعة:</strong> {{ child.group.name if child.group else '—' }}</p>
+            <p class="mb-1"><strong>المرحلة:</strong> {{ child.group.stage.name if child.group else '—' }}</p>
+            <p class="mb-0"><strong>المدرسة:</strong> {{ child.school_name or '—' }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <h4 class="mt-4 mb-3"><i class="bi bi-file-earmark-text"></i> التقارير</h4>
+  {% if reports %}
+    <div class="row g-3">
+      {% for r in reports %}
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h6>{{ r.student.user.full_name }} - {{ r.period_label }}</h6>
+              <p class="small text-muted">{{ r.created_at.strftime('%Y-%m-%d') }}</p>
+              <span class="badge bg-{{ 'success' if r.overall_rating in ['ممتاز', 'متميز'] else 'info' if r.overall_rating == 'جيد جداً' else 'warning' }}">
+                {{ r.overall_rating }}
+              </span>
+              <p class="mt-2 small">{{ r.teacher_comment or '' }}</p>
+              <a href="{{ url_for('admin_report_pdf', report_id=r.id) }}" class="btn btn-sm btn-danger">
+                <i class="bi bi-file-pdf"></i> تحميل PDF
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">لا توجد تقارير لسه</div>
+  {% endif %}
+</div>
+{% endblock %}

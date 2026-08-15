@@ -1,0 +1,97 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}تسليمات الواجب{% endblock %}
+{% block admin_content %}
+<div class="page-header">
+  <a href="{{ url_for('admin_homework') }}" class="btn btn-sm btn-outline-secondary mb-2">
+    <i class="bi bi-arrow-right"></i> رجوع
+  </a>
+  <h2><i class="bi bi-journal-text"></i> {{ homework.title }}</h2>
+  <p class="text-muted">
+    {{ homework.group.stage.name }} - {{ homework.group.name }}
+    {% if homework.due_date %}- آخر موعد: {{ homework.due_date }}{% endif %}
+  </p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>الطالب</th>
+          <th>وقت التسليم</th>
+          <th>الملف</th>
+          <th>الإجابة</th>
+          <th>التقييم</th>
+          <th>الحالة</th>
+          <th>إجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in homework.submissions %}
+          <tr>
+            <td><strong>{{ sub.student.user.full_name }}</strong></td>
+            <td><small>{{ sub.submitted_at.strftime('%Y-%m-%d %H:%M') }}</small></td>
+            <td>
+              {% if sub.file_path %}
+                <a href="{{ url_for('serve_upload', filename=sub.file_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-paperclip"></i> عرض
+                </a>
+              {% else %}—{% endif %}
+            </td>
+            <td><small>{{ sub.text_answer or '—' }}</small></td>
+            <td>
+              <span class="badge bg-{{ 'success' if sub.grade == 'متميز' else 'info' if sub.grade == 'جيد' else 'warning' }}">
+                {{ sub.grade or '—' }}
+              </span>
+            </td>
+            <td>{{ sub.status }}</td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#grade{{ sub.id }}">
+                <i class="bi bi-check2"></i> تقييم
+              </button>
+            </td>
+          </tr>
+          <div class="modal fade" id="grade{{ sub.id }}">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <form method="POST" action="{{ url_for('admin_grade_submission', sub_id=sub.id) }}">
+                  <div class="modal-header"><h5>تقييم تسليم: {{ sub.student.user.full_name }}</h5></div>
+                  <div class="modal-body">
+                    {% if sub.text_answer %}
+                      <p><strong>الإجابة:</strong><br>{{ sub.text_answer }}</p>
+                    {% endif %}
+                    {% if sub.file_path %}
+                      <a href="{{ url_for('serve_upload', filename=sub.file_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary mb-2">
+                        <i class="bi bi-paperclip"></i> عرض الملف
+                      </a>
+                    {% endif %}
+                    <div class="mb-3">
+                      <label class="form-label">التقييم</label>
+                      <select name="grade" class="form-select">
+                        <option value="متميز" {% if sub.grade == 'متميز' %}selected{% endif %}>متميز</option>
+                        <option value="جيد جداً" {% if sub.grade == 'جيد جداً' %}selected{% endif %}>جيد جداً</option>
+                        <option value="جيد" {% if sub.grade == 'جيد' %}selected{% endif %}>جيد</option>
+                        <option value="يحتاج مراجعة" {% if sub.grade == 'يحتاج مراجعة' %}selected{% endif %}>يحتاج مراجعة</option>
+                      </select>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label">تعليق المدرّس</label>
+                      <textarea name="teacher_comment" class="form-control" rows="3">{{ sub.teacher_comment or '' }}</textarea>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التقييم</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <tr><td colspan="7" class="text-center text-muted py-4">محدش سلم الواجب لسه</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

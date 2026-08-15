@@ -1,0 +1,94 @@
+{% extends "student/_layout.html" %}
+{% block student_title %}الواجبات{% endblock %}
+{% block student_content %}
+<div class="page-header">
+  <h2><i class="bi bi-journal-text"></i> الواجبات المطلوبة</h2>
+  <p class="text-muted">{{ group.name }}</p>
+</div>
+
+{% if homework %}
+<div class="row g-3">
+  {% for hw in homework %}
+    {% set sub = submissions.get(hw.id) %}
+    <div class="col-md-6">
+      <div class="card homework-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title">{{ hw.title }}</h5>
+            {% if sub %}
+              <span class="badge bg-{{ 'success' if sub.status == 'تم التصحيح' else 'info' }}">{{ sub.status }}</span>
+            {% else %}
+              <span class="badge bg-warning">لم يسلم</span>
+            {% endif %}
+          </div>
+          {% if hw.description %}
+            <p class="text-muted small">{{ hw.description }}</p>
+          {% endif %}
+          {% if hw.due_date %}
+            <p class="text-danger small"><i class="bi bi-clock"></i> آخر موعد: {{ hw.due_date }}</p>
+          {% endif %}
+          {% if hw.attachment_path %}
+            <a href="{{ url_for('serve_upload', filename=hw.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary mb-2">
+              <i class="bi bi-paperclip"></i> ملف الواجب
+            </a>
+          {% endif %}
+
+          {% if sub %}
+            <div class="alert alert-light border mt-2">
+              <small><strong>تسليمك:</strong> {{ sub.submitted_at.strftime('%Y-%m-%d %H:%M') }}</small>
+              {% if sub.text_answer %}<br><small>{{ sub.text_answer }}</small>{% endif %}
+              {% if sub.file_path %}
+                <br><a href="{{ url_for('serve_upload', filename=sub.file_path) }}" target="_blank" class="btn btn-sm btn-outline-primary mt-1">
+                  <i class="bi bi-paperclip"></i> ملفك
+                </a>
+              {% endif %}
+              {% if sub.grade %}
+                <hr>
+                <strong>التقييم: </strong>
+                <span class="badge bg-{{ 'success' if sub.grade == 'متميز' else 'info' if sub.grade == 'جيد' else 'warning' }}">{{ sub.grade }}</span>
+                {% if sub.teacher_comment %}
+                  <br><small class="text-muted"><i class="bi bi-chat-quote"></i> {{ sub.teacher_comment }}</small>
+                {% endif %}
+              {% endif %}
+            </div>
+            <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#submit{{ hw.id }}">
+              <i class="bi bi-arrow-repeat"></i> إعادة التسليم
+            </button>
+          {% else %}
+            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#submit{{ hw.id }}">
+              <i class="bi bi-upload"></i> سلم الواجب
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="submit{{ hw.id }}">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form method="POST" action="{{ url_for('student_submit_homework', hw_id=hw.id) }}" enctype="multipart/form-data">
+            <div class="modal-header"><h5>تسليم: {{ hw.title }}</h5></div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">الإجابة النصية (اختياري)</label>
+                <textarea name="text_answer" class="form-control" rows="4" placeholder="اكتب إجابتك هنا...">{{ sub.text_answer if sub else '' }}</textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">ملف (اختياري)</label>
+                <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png,.zip">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+              <button type="submit" class="btn btn-primary">تسليم</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% else %}
+  <div class="alert alert-info text-center">مفيش واجبات مطلوبة دلوقتي 🎉</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "student/_layout.html" %}
+{% block student_title %}الرئيسية{% endblock %}
+{% block student_content %}
+<div class="welcome-banner">
+  <div>
+    <h2>أهلاً يا {{ current_user.full_name }} 👋</h2>
+    <p>إليك ملخص مجموعتك والواجبات المطلوبة</p>
+  </div>
+  {% if group %}
+    <div class="text-end">
+      <h5 class="mb-1">{{ group.name }}</h5>
+      <span class="badge bg-light text-dark">{{ group.stage.name }}</span>
+    </div>
+  {% endif %}
+</div>
+
+{% if not group %}
+  <div class="alert alert-warning">
+    <i class="bi bi-exclamation-triangle"></i>
+    لسه ما تم إضافتك لمجموعة. كلم الأستاذ محمود عشان يضيفك.
+  </div>
+{% else %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="student-stat">
+      <i class="bi bi-journal-text text-primary"></i>
+      <strong>{{ homework|length }}</strong>
+      <small>واجب</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="student-stat">
+      <i class="bi bi-play-circle text-success"></i>
+      <strong>{{ videos|length }}</strong>
+      <small>فيديو</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="student-stat">
+      <i class="bi bi-calendar3 text-info"></i>
+      <strong>{{ schedules|length }}</strong>
+      <small>موعد أسبوعي</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="student-stat">
+      <i class="bi bi-calendar-event text-warning"></i>
+      <strong>{{ upcoming|length }}</strong>
+      <small>حصة جاية</small>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        <span><i class="bi bi-journal-text"></i> أحدث الواجبات</span>
+        <a href="{{ url_for('student_homework') }}">الكل</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for hw in homework %}
+          <li class="list-group-item">
+            <strong>{{ hw.title }}</strong>
+            {% if hw.due_date %}
+              <br><small class="text-danger"><i class="bi bi-clock"></i> {{ hw.due_date }}</small>
+            {% endif %}
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted text-center">مفيش واجبات</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between">
+        <span><i class="bi bi-play-circle"></i> أحدث الفيديوهات</span>
+        <a href="{{ url_for('student_videos') }}">الكل</a>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for v in videos %}
+          <li class="list-group-item d-flex justify-content-between">
+            <div>
+              <strong>{{ v.title }}</strong>
+              {% if v.topic %}<br><small class="text-muted">{{ v.topic }}</small>{% endif %}
+            </div>
+            {% if v.duration %}<span class="badge bg-info">{{ v.duration }}</span>{% endif %}
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted text-center">مفيش فيديوهات</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-calendar3"></i> المواعيد الأسبوعية</div>
+      <div class="card-body">
+        {% if schedules %}
+          <div class="row g-2">
+            {% for s in schedules %}
+              <div class="col-md-3 col-6">
+                <div class="schedule-pill">
+                  <strong>{{ s.day_name() }}</strong>
+                  <br>{{ s.start_time }} - {{ s.end_time }}
+                  <br><small class="text-muted">{{ s.location }}</small>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted text-center mb-0">مفيش مواعيد مسجلة</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

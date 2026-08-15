@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}حجز درس جديد - منصة الحاج{% endblock %}
+{% block body %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="لوجو منصة الحاج" class="mb-3" style="max-height: 120px;">
+            <h2 class="brand-text">احجز درس تجريبي</h2>
+            <p class="text-muted">منصة الحاج في اللغة العربية</p>
+          </div>
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endwith %}
+
+          <form method="POST">
+            <div class="mb-3">
+              <label class="form-label">اسم الطالب</label>
+              <input type="text" name="student_name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">رقم تليفون الطالب</label>
+              <input type="tel" name="student_phone" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">رقم ولي الأمر (واتساب)</label>
+              <input type="tel" name="parent_phone" class="form-control">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">المرحلة الدراسية</label>
+              <select name="stage_id" class="form-select" required>
+                <option value="">اختر المرحلة</option>
+                {% for s in stages %}
+                  <option value="{{ s.id }}">{{ s.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">الموعد المفضل</label>
+              <select name="preferred_day" class="form-select">
+                <option value="">أي وقت</option>
+                <option>السبت</option><option>الأحد</option><option>الإثنين</option>
+                <option>الثلاثاء</option><option>الأربعاء</option><option>الخميس</option><option>الجمعة</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">ملاحظات</label>
+              <textarea name="notes" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-send"></i> إرسال الطلب
+            </button>
+          </form>
+
+          <div class="text-center mt-3">
+            <a href="{{ url_for('login') }}" class="text-decoration-none">لديك حساب؟ سجل دخول</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}تسجيل الدخول - منصة الحاج{% endblock %}
+{% block body %}
+<div class="login-page">
+  <div class="login-card">
+    <div class="text-center mb-4">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="لوجو منصة الحاج" class="login-logo">
+      <h2 class="brand-text">منصة الحاج</h2>
+      <p class="text-muted">في اللغة العربية</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="mb-3">
+        <label class="form-label">اسم المستخدم</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input type="text" name="username" class="form-control" required autofocus>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">كلمة المرور</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-box-arrow-in-left"></i> دخول
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <a href="{{ url_for('public_booking') }}" class="text-decoration-none">
+        <i class="bi bi-calendar-plus"></i> حجز درس جديد
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

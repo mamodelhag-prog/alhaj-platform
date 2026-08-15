@@ -1,0 +1,95 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}الواجبات{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-journal-text"></i> الواجبات</h2>
+    <p class="text-muted">رفع واجبات للمجموعات ومتابعة التسليمات</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addHWModal">
+    <i class="bi bi-plus-circle"></i> واجب جديد
+  </button>
+</div>
+
+<div class="row g-3">
+  {% for hw in homework %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card homework-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <h5 class="card-title">{{ hw.title }}</h5>
+            {% if hw.is_active %}<span class="badge bg-success">نشط</span>{% else %}<span class="badge bg-secondary">معطل</span>{% endif %}
+          </div>
+          <p class="text-muted small">{{ hw.group.stage.name }} - {{ hw.group.name }}</p>
+          <p class="small">{{ hw.description or '—' }}</p>
+          {% if hw.due_date %}
+            <p class="small text-danger"><i class="bi bi-clock"></i> آخر موعد: {{ hw.due_date }}</p>
+          {% endif %}
+          {% if hw.attachment_path %}
+            <a href="{{ url_for('serve_upload', filename=hw.attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary mb-2">
+              <i class="bi bi-paperclip"></i> ملف مرفق
+            </a>
+          {% endif %}
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <span class="badge bg-info">
+              <i class="bi bi-box-arrow-in-up"></i> {{ hw.submissions|length }} تسليم
+            </span>
+            <div>
+              <a href="{{ url_for('admin_homework_submissions', hw_id=hw.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-eye"></i> التسليمات
+              </a>
+              <form method="POST" action="{{ url_for('admin_delete_homework', hw_id=hw.id) }}" class="d-inline" onsubmit="return confirm('حذف الواجب؟')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12 text-center text-muted py-5">لا يوجد واجبات. ارفع أول واجب.</div>
+  {% endfor %}
+</div>
+
+<div class="modal fade" id="addHWModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" enctype="multipart/form-data">
+        <div class="modal-header"><h5>رفع واجب جديد</h5></div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">المجموعة</label>
+            <select name="group_id" class="form-select" required>
+              <option value="">اختر</option>
+              {% for g in groups %}
+                <option value="{{ g.id }}">{{ g.stage.name }} - {{ g.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">عنوان الواجب</label>
+            <input type="text" name="title" class="form-control" placeholder="مثال: حل أسئلة النحو صفحة 25" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الوصف</label>
+            <textarea name="description" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">آخر موعد للتسليم</label>
+            <input type="date" name="due_date" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">ملف مرفق (اختياري)</label>
+            <input type="file" name="attachment" class="form-control" accept=".pdf,.doc,.docx,.jpg,.png,.zip">
+            <small class="text-muted">PDF, Word, صور, ZIP</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">نشر</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

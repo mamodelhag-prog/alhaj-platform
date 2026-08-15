@@ -1,0 +1,145 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}المجموعات{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-people"></i> المجموعات</h2>
+    <p class="text-muted">إدارة مجموعات الطلاب داخل كل مرحلة</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGroupModal">
+    <i class="bi bi-plus-circle"></i> مجموعة جديدة
+  </button>
+</div>
+
+<div class="row g-3">
+  {% for g in groups %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card group-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0">{{ g.name }}</h5>
+            <span class="badge bg-secondary">{{ g.stage.name }}</span>
+          </div>
+          <p class="text-muted small mb-2">{{ g.description or 'بدون وصف' }}</p>
+          <div class="d-flex justify-content-between text-center my-3">
+            <div>
+              <strong>{{ g.students|length }}</strong>
+              <br><small class="text-muted">طالب</small>
+            </div>
+            <div>
+              <strong>{{ g.schedules|length }}</strong>
+              <br><small class="text-muted">موعد</small>
+            </div>
+            <div>
+              <strong>{{ g.monthly_fee }}</strong>
+              <br><small class="text-muted">جنيه/شهر</small>
+            </div>
+            <div>
+              <strong>{{ g.capacity }}</strong>
+              <br><small class="text-muted">السعة</small>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-fill" data-bs-toggle="modal" data-bs-target="#edit{{ g.id }}">
+              <i class="bi bi-pencil"></i> تعديل
+            </button>
+            <form method="POST" action="{{ url_for('admin_delete_group', group_id=g.id) }}" onsubmit="return confirm('متأكد؟')" class="d-inline">
+              <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="col-12 text-center text-muted py-5">لا يوجد مجموعات. أضف أول مجموعة.</div>
+  {% endfor %}
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addGroupModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST">
+        <div class="modal-header"><h5>إضافة مجموعة جديدة</h5></div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">اسم المجموعة</label>
+            <input type="text" name="name" class="form-control" placeholder="مثال: رابع ابتدائي - مجموعة السبت" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">المرحلة</label>
+            <select name="stage_id" class="form-select" required>
+              <option value="">اختر المرحلة</option>
+              {% for s in stages %}
+                <option value="{{ s.id }}">{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">الرسوم الشهرية</label>
+              <input type="number" name="monthly_fee" class="form-control" value="0" min="0">
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">السعة</label>
+              <input type="number" name="capacity" class="form-control" value="20" min="1">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الوصف</label>
+            <input type="text" name="description" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">إضافة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% for g in groups %}
+<div class="modal fade" id="edit{{ g.id }}">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('admin_edit_group', group_id=g.id) }}">
+        <div class="modal-header"><h5>تعديل المجموعة</h5></div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">اسم المجموعة</label>
+            <input type="text" name="name" class="form-control" value="{{ g.name }}" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">المرحلة</label>
+            <select name="stage_id" class="form-select">
+              {% for s in stages %}
+                <option value="{{ s.id }}" {% if s.id == g.stage_id %}selected{% endif %}>{{ s.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">الرسوم الشهرية</label>
+              <input type="number" name="monthly_fee" class="form-control" value="{{ g.monthly_fee }}" min="0">
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">السعة</label>
+              <input type="number" name="capacity" class="form-control" value="{{ g.capacity }}" min="1">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الوصف</label>
+            <input type="text" name="description" class="form-control" value="{{ g.description or '' }}">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}

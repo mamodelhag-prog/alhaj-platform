@@ -1,0 +1,92 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}الحضور والغياب{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-check2-square"></i> الحضور والغياب</h2>
+    <p class="text-muted">إنشاء حصص جديدة وتسجيل الحضور</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSessionModal">
+    <i class="bi bi-plus-circle"></i> حصة جديدة
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-header"><i class="bi bi-calendar-event"></i> آخر الحصص</div>
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>التاريخ</th>
+          <th>المجموعة</th>
+          <th>الموضوع</th>
+          <th>الوقت</th>
+          <th>عدد المسجلين</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in sessions %}
+          <tr>
+            <td>{{ s.session_date }}</td>
+            <td>{{ s.group.name }} <small class="text-muted">({{ s.group.stage.name }})</small></td>
+            <td>{{ s.topic or '—' }}</td>
+            <td>{{ s.start_time or '—' }}</td>
+            <td><span class="badge bg-info">{{ s.attendance|length }}</span></td>
+            <td>
+              <a href="{{ url_for('admin_attendance_session', session_id=s.id) }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-pencil-square"></i> تسجيل الحضور
+              </a>
+              <form method="POST" action="{{ url_for('admin_delete_session', session_id=s.id) }}" class="d-inline" onsubmit="return confirm('حذف الحصة وكل سجلات الحضور فيها؟')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-center text-muted py-4">لا يوجد حصص. أنشئ أول حصة.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="newSessionModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="POST">
+        <input type="hidden" name="action" value="create_session">
+        <div class="modal-header"><h5>إنشاء حصة جديدة</h5></div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">المجموعة</label>
+            <select name="group_id" class="form-select" required>
+              <option value="">اختر</option>
+              {% for g in groups %}
+                <option value="{{ g.id }}">{{ g.stage.name }} - {{ g.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="row">
+            <div class="col-7 mb-3">
+              <label class="form-label">التاريخ</label>
+              <input type="date" name="session_date" class="form-control" value="{{ today }}" required>
+            </div>
+            <div class="col-5 mb-3">
+              <label class="form-label">الوقت</label>
+              <input type="time" name="start_time" class="form-control">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">الموضوع</label>
+            <input type="text" name="topic" class="form-control" placeholder="مثال: النحو - المبتدأ والخبر">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">إنشاء الحصة</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "student/_layout.html" %}
+{% block student_title %}فيديوهات الشرح{% endblock %}
+{% block student_content %}
+<div class="page-header">
+  <h2><i class="bi bi-play-circle"></i> فيديوهات الشرح</h2>
+  <p class="text-muted">{{ group.name }}</p>
+</div>
+
+{% if videos %}
+<div class="row g-3">
+  {% for v in videos %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card video-card">
+        <div class="ratio ratio-16x9">
+          <video controls preload="metadata">
+            <source src="{{ url_for('serve_upload', filename=v.file_path) }}">
+            المتصفح بتاعك مش بيدعم تشغيل الفيديو
+          </video>
+        </div>
+        <div class="card-body">
+          <h6 class="card-title">{{ v.title }}</h6>
+          {% if v.topic %}<span class="badge bg-secondary mb-2">{{ v.topic }}</span>{% endif %}
+          {% if v.duration %}<span class="badge bg-info mb-2"><i class="bi bi-clock"></i> {{ v.duration }}</span>{% endif %}
+          {% if v.description %}<p class="small text-muted mt-2">{{ v.description }}</p>{% endif %}
+          <small class="text-muted">رفع: {{ v.uploaded_at.strftime('%Y-%m-%d') }}</small>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% else %}
+  <div class="alert alert-info text-center">مفيش فيديوهات متاحة دلوقتي</div>
+{% endif %}
+{% endblock %}

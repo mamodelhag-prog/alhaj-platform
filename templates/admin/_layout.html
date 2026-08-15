@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}{% block admin_title %}لوحة التحكم{% endblock %} - منصة الحاج{% endblock %}
+{% block body %}
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="{{ url_for('static', filename='img/logo-80.png') }}" alt="لوجو منصة الحاج" class="sidebar-logo">
+      <div>
+        <h5 class="brand-text mb-0">منصة الحاج</h5>
+        <small class="text-muted">في اللغة العربية</small>
+      </div>
+      <button class="btn btn-sm btn-light d-md-none ms-auto" id="closeSidebar">
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i> <span>الرئيسية</span>
+      </a>
+      <a href="{{ url_for('admin_stages') }}" class="nav-item {% if 'stage' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-layers"></i> <span>المراحل</span>
+      </a>
+      <a href="{{ url_for('admin_groups') }}" class="nav-item {% if 'group' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-people"></i> <span>المجموعات</span>
+      </a>
+      <a href="{{ url_for('admin_students') }}" class="nav-item {% if 'student' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-person-badge"></i> <span>الطلاب</span>
+      </a>
+      <a href="{{ url_for('admin_schedules') }}" class="nav-item {% if 'schedule' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-calendar3"></i> <span>المواعيد</span>
+      </a>
+      <a href="{{ url_for('admin_bookings') }}" class="nav-item {% if 'booking' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-calendar-plus"></i> <span>الحجوزات</span>
+      </a>
+      <a href="{{ url_for('admin_payments') }}" class="nav-item {% if 'payment' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-cash-coin"></i> <span>المدفوعات</span>
+      </a>
+      <a href="{{ url_for('admin_attendance') }}" class="nav-item {% if 'attendance' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-check2-square"></i> <span>الحضور</span>
+      </a>
+      <a href="{{ url_for('admin_homework') }}" class="nav-item {% if 'homework' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-journal-text"></i> <span>الواجبات</span>
+      </a>
+      <a href="{{ url_for('admin_videos') }}" class="nav-item {% if 'video' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-play-circle"></i> <span>الفيديوهات</span>
+      </a>
+      <a href="{{ url_for('admin_reports') }}" class="nav-item {% if 'report' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-file-earmark-text"></i> <span>التقارير</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info mb-2">
+        <i class="bi bi-person-circle"></i>
+        <span>{{ current_user.full_name }}</span>
+      </div>
+      <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-light w-100">
+        <i class="bi bi-box-arrow-right"></i> خروج
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <div class="main-content">
+    <header class="topbar d-md-none">
+      <button class="btn btn-primary" id="openSidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <h5 class="mb-0 brand-text">منصة الحاج</h5>
+    </header>
+
+    <main class="page-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endwith %}
+
+      {% block admin_content %}{% endblock %}
+    </main>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.getElementById("openSidebar")?.addEventListener("click", () => {
+    document.getElementById("sidebar").classList.add("open");
+  });
+  document.getElementById("closeSidebar")?.addEventListener("click", () => {
+    document.getElementById("sidebar").classList.remove("open");
+  });
+</script>
+{% endblock %}

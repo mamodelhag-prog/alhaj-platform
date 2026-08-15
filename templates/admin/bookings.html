@@ -1,0 +1,70 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}الحجوزات{% endblock %}
+{% block admin_content %}
+<div class="page-header">
+  <h2><i class="bi bi-calendar-plus"></i> الحجوزات الجديدة</h2>
+  <p class="text-muted">طلبات الحجز من الطلاب المهتمين</p>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>الطالب</th>
+          <th>التليفون</th>
+          <th>المرحلة</th>
+          <th>الموعد المفضل</th>
+          <th>ملاحظات</th>
+          <th>الحالة</th>
+          <th>التاريخ</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in bookings %}
+          <tr>
+            <td><strong>{{ b.student_name }}</strong></td>
+            <td>
+              <a href="tel:{{ b.student_phone }}">{{ b.student_phone }}</a>
+              {% if b.parent_phone %}
+                <br><small class="text-muted">ولي الأمر: {{ b.parent_phone }}</small>
+              {% endif %}
+            </td>
+            <td>{{ b.stage.name if b.stage else '—' }}</td>
+            <td>{{ b.preferred_day or 'أي وقت' }}</td>
+            <td><small>{{ b.notes or '—' }}</small></td>
+            <td>
+              <form method="POST" class="d-inline">
+                <input type="hidden" name="action" value="status">
+                <input type="hidden" name="booking_id" value="{{ b.id }}">
+                <select name="status" onchange="this.form.submit()" class="form-select form-select-sm">
+                  <option {% if b.status == 'جديد' %}selected{% endif %}>جديد</option>
+                  <option {% if b.status == 'تم التواصل' %}selected{% endif %}>تم التواصل</option>
+                  <option {% if b.status == 'محجوز' %}selected{% endif %}>محجوز</option>
+                  <option {% if b.status == 'ملغي' %}selected{% endif %}>ملغي</option>
+                </select>
+              </form>
+            </td>
+            <td><small>{{ b.created_at.strftime('%Y-%m-%d') }}</small></td>
+            <td>
+              {% if b.parent_phone %}
+                <a href="https://wa.me/{{ b.parent_phone|replace('+', '')|replace(' ', '') }}" target="_blank" class="btn btn-sm btn-success">
+                  <i class="bi bi-whatsapp"></i>
+                </a>
+              {% endif %}
+              <form method="POST" class="d-inline" onsubmit="return confirm('حذف الحجز؟')">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="booking_id" value="{{ b.id }}">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="8" class="text-center text-muted py-4">لا يوجد حجوزات</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

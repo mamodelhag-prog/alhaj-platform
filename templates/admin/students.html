@@ -1,0 +1,191 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}الطلاب{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-person-badge"></i> الطلاب</h2>
+    <p class="text-muted">إدارة بيانات الطلاب وأولياء الأمور</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
+    <i class="bi bi-plus-circle"></i> طالب جديد
+  </button>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>الاسم</th>
+          <th>المجموعة</th>
+          <th>المرحلة</th>
+          <th>المدرسة</th>
+          <th>التليفون</th>
+          <th>الحالة</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in students %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td><strong>{{ s.user.full_name }}</strong><br><small class="text-muted">{{ s.user.username }}</small></td>
+            <td>{{ s.group.name if s.group else '—' }}</td>
+            <td>{{ s.group.stage.name if s.group else '—' }}</td>
+            <td>{{ s.school_name or '—' }}</td>
+            <td><i class="bi bi-whatsapp text-success"></i> {{ s.user.whatsapp or s.user.phone or '—' }}</td>
+            <td>
+              {% if s.is_active and s.user.is_active %}
+                <span class="badge bg-success">نشط</span>
+              {% else %}
+                <span class="badge bg-secondary">معطل</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{{ url_for('admin_student_details', student_id=s.id) }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-eye"></i>
+              </a>
+              <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#edit{{ s.id }}">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <form method="POST" action="{{ url_for('admin_delete_student', student_id=s.id) }}" class="d-inline" onsubmit="return confirm('متأكد؟')">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          <!-- Edit Modal -->
+          <div class="modal fade" id="edit{{ s.id }}">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <form method="POST" action="{{ url_for('admin_edit_student', student_id=s.id) }}">
+                  <div class="modal-header"><h5>تعديل بيانات الطالب</h5></div>
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">الاسم الكامل</label>
+                        <input type="text" name="full_name" class="form-control" value="{{ s.user.full_name }}" required>
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">رقم التليفون</label>
+                        <input type="tel" name="phone" class="form-control" value="{{ s.user.phone or '' }}">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">واتساب</label>
+                        <input type="tel" name="whatsapp" class="form-control" value="{{ s.user.whatsapp or '' }}">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">المدرسة</label>
+                        <input type="text" name="school_name" class="form-control" value="{{ s.school_name or '' }}">
+                      </div>
+                      <div class="col-md-12 mb-3">
+                        <label class="form-label">المجموعة</label>
+                        <select name="group_id" class="form-select">
+                          <option value="">بدون مجموعة</option>
+                          {% for g in groups %}
+                            <option value="{{ g.id }}" {% if g.id == s.group_id %}selected{% endif %}>{{ g.stage.name }} - {{ g.name }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-md-12 mb-3">
+                        <label class="form-label">ملاحظات</label>
+                        <textarea name="notes" class="form-control" rows="2">{{ s.notes or '' }}</textarea>
+                      </div>
+                      <div class="col-md-12">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" name="is_active" id="active{{ s.id }}" {% if s.user.is_active %}checked{% endif %}>
+                          <label class="form-check-label" for="active{{ s.id }}">حساب نشط</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <tr><td colspan="8" class="text-center text-muted py-4">لا يوجد طلاب. أضف طالب جديد.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Modal -->
+<div class="modal fade" id="addStudentModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST">
+        <div class="modal-header"><h5>إضافة طالب جديد</h5></div>
+        <div class="modal-body">
+          <h6 class="text-primary mb-3">بيانات الطالب</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">الاسم الكامل *</label>
+              <input type="text" name="full_name" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">اسم المستخدم (للدخول) *</label>
+              <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">كلمة المرور</label>
+              <input type="text" name="password" class="form-control" value="123456">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">المدرسة</label>
+              <input type="text" name="school_name" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">تليفون الطالب</label>
+              <input type="tel" name="phone" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">واتساب الطالب</label>
+              <input type="tel" name="whatsapp" class="form-control">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">المجموعة</label>
+              <select name="group_id" class="form-select">
+                <option value="">بدون مجموعة</option>
+                {% for g in groups %}
+                  <option value="{{ g.id }}">{{ g.stage.name }} - {{ g.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">ملاحظات</label>
+              <textarea name="notes" class="form-control" rows="2"></textarea>
+            </div>
+          </div>
+
+          <hr>
+          <h6 class="text-primary mb-3">بيانات ولي الأمر (اختياري)</h6>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">اسم ولي الأمر</label>
+              <input type="text" name="parent_name" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">تليفون ولي الأمر</label>
+              <input type="tel" name="parent_phone" class="form-control">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">واتساب ولي الأمر</label>
+              <input type="tel" name="parent_whatsapp" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">إضافة الطالب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

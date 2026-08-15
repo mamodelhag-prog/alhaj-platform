@@ -1,0 +1,27 @@
+{% extends "student/_layout.html" %}
+{% block student_title %}المواعيد{% endblock %}
+{% block student_content %}
+<div class="page-header">
+  <h2><i class="bi bi-calendar3"></i> مواعيد المجموعة</h2>
+  <p class="text-muted">{{ group.stage.name }} - {{ group.name }}</p>
+</div>
+
+{% if schedules %}
+<div class="row g-3">
+  {% for s in schedules %}
+    <div class="col-md-4 col-6">
+      <div class="card schedule-card text-center">
+        <div class="card-body">
+          <div class="day-badge">{{ s.day_name() }}</div>
+          <h3 class="mt-3 mb-2">{{ s.start_time }}</h3>
+          <p class="text-muted">إلى {{ s.end_time }}</p>
+          <p class="mb-0"><i class="bi bi-geo-alt"></i> {{ s.location }}</p>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% else %}
+  <div class="alert alert-info text-center">مفيش مواعيد مسجلة لمجموعتك لسه</div>
+{% endif %}
+{% endblock %}

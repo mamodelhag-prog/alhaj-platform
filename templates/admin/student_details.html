@@ -1,0 +1,94 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}تفاصيل الطالب{% endblock %}
+{% block admin_content %}
+<div class="page-header">
+  <a href="{{ url_for('admin_students') }}" class="btn btn-sm btn-outline-secondary mb-2">
+    <i class="bi bi-arrow-right"></i> رجوع
+  </a>
+  <h2><i class="bi bi-person-circle"></i> {{ student.user.full_name }}</h2>
+  <p class="text-muted">{{ student.group.stage.name if student.group else '—' }} - {{ student.group.name if student.group else 'بدون مجموعة' }}</p>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="info-card">
+      <i class="bi bi-person-badge text-primary"></i>
+      <h6>الاسم</h6>
+      <p>{{ student.user.full_name }}</p>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="info-card">
+      <i class="bi bi-telephone text-success"></i>
+      <h6>التليفون</h6>
+      <p>{{ student.user.phone or '—' }}</p>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="info-card">
+      <i class="bi bi-whatsapp text-success"></i>
+      <h6>واتساب</h6>
+      <p>{{ student.user.whatsapp or '—' }}</p>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="info-card">
+      <i class="bi bi-school text-info"></i>
+      <h6>المدرسة</h6>
+      <p>{{ student.school_name or '—' }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-cash-coin"></i> المدفوعات</div>
+      <ul class="list-group list-group-flush">
+        {% for p in student.payments[-5:]|reverse %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ p.payment_date }} - {{ p.for_month or '' }}</span>
+            <strong class="text-success">{{ p.amount }} ج</strong>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted text-center">لا يوجد مدفوعات</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-check2-square"></i> آخر سجلات الحضور</div>
+      <ul class="list-group list-group-flush">
+        {% for a in student.attendance[-5:]|reverse %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ a.session.session_date }} - {{ a.session.topic or 'حصة' }}</span>
+            <span class="badge bg-{{ 'success' if a.status == 'حاضر' else 'danger' if a.status == 'غائب' else 'warning' }}">{{ a.status }}</span>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted text-center">لا يوجد سجلات</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header"><i class="bi bi-people"></i> أولياء الأمور</div>
+      <ul class="list-group list-group-flush">
+        {% for pl in student.parent_links %}
+          <li class="list-group-item d-flex justify-content-between">
+            <div>
+              <strong>{{ pl.user.full_name }}</strong> - {{ pl.relation }}
+              <br><small class="text-muted">{{ pl.user.phone or '' }} - {{ pl.user.whatsapp or '' }}</small>
+            </div>
+            <span class="badge bg-secondary">{{ pl.user.username }}</span>
+          </li>
+        {% else %}
+          <li class="list-group-item text-muted text-center">لا يوجد أولياء أمور مسجلين</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

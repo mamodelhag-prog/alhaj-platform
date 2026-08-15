@@ -1,0 +1,133 @@
+{% extends "admin/_layout.html" %}
+{% block admin_title %}التقارير{% endblock %}
+{% block admin_content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+  <div>
+    <h2><i class="bi bi-file-earmark-text"></i> تقارير أولياء الأمور</h2>
+    <p class="text-muted">إنشاء وإرسال تقارير لولي الأمر</p>
+  </div>
+  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addReportModal">
+    <i class="bi bi-plus-circle"></i> تقرير جديد
+  </button>
+</div>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>الطالب</th>
+          <th>الفترة</th>
+          <th>عن شهر</th>
+          <th>التقييم</th>
+          <th>تاريخ الإنشاء</th>
+          <th>إجراءات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+          <tr>
+            <td><strong>{{ r.student.user.full_name }}</strong></td>
+            <td><span class="badge bg-info">{{ r.period }}</span></td>
+            <td>{{ r.period_label or '—' }}</td>
+            <td>
+              <span class="badge bg-{{ 'success' if r.overall_rating in ['ممتاز', 'متميز'] else 'info' if r.overall_rating == 'جيد جداً' else 'warning' }}">
+                {{ r.overall_rating }}
+              </span>
+            </td>
+            <td><small>{{ r.created_at.strftime('%Y-%m-%d') }}</small></td>
+            <td>
+              <a href="{{ url_for('admin_view_report', report_id=r.id) }}" class="btn btn-sm btn-outline-info">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('admin_report_pdf', report_id=r.id) }}" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-file-pdf"></i> PDF
+              </a>
+              {% if r.student.user.whatsapp %}
+                {% set msg = "تقرير الطالب/ة: " ~ r.student.user.full_name ~ " - " ~ r.period_label ~ " - التقييم: " ~ r.overall_rating %}
+                <a href="https://wa.me/{{ r.student.user.whatsapp|replace('+', '')|replace(' ', '') }}?text={{ msg|urlencode }}" target="_blank" class="btn btn-sm btn-success">
+                  <i class="bi bi-whatsapp"></i>
+                </a>
+              {% endif %}
+              {% set parent_link = r.student.parent_links|first %}
+              {% if parent_link and parent_link.user.whatsapp %}
+                {% set msg = "تقرير الطالب/ة: " ~ r.student.user.full_name ~ " - " ~ r.period_label ~ " - التقييم: " ~ r.overall_rating %}
+                <a href="https://wa.me/{{ parent_link.user.whatsapp|replace('+', '')|replace(' ', '') }}?text={{ msg|urlencode }}" target="_blank" class="btn btn-sm btn-success" title="إرسال لولي الأمر">
+                  <i class="bi bi-send"></i>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6" class="text-center text-muted py-4">لا يوجد تقارير. أنشئ أول تقرير.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="addReportModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST">
+        <div class="modal-header"><h5>إنشاء تقرير جديد</h5></div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">الطالب</label>
+              <select name="student_id" class="form-select" required>
+                <option value="">اختر</option>
+                {% for s in students %}
+                  <option value="{{ s.id }}">{{ s.user.full_name }}{% if s.group %} - {{ s.group.name }}{% endif %}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">نوع الفترة</label>
+              <select name="period" class="form-select">
+                <option>شهري</option>
+                <option>أسبوعي</option>
+                <option>ربع سنوي</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">عن شهر</label>
+              <input type="text" name="period_label" class="form-control" placeholder="أغسطس 2026">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">ملخص الحضور</label>
+              <input type="text" name="attendance_summary" class="form-control" placeholder="مثال: 8 حصص من 10">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">ملخص الواجبات</label>
+              <input type="text" name="homework_summary" class="form-control" placeholder="مثال: 5 واجبات من 7 - تقييم عام: جيد جداً">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">حالة المدفوعات</label>
+              <input type="text" name="payment_status" class="form-control" placeholder="مثال: مدفوع حتى شهر 8">
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">التقييم العام</label>
+              <select name="overall_rating" class="form-select">
+                <option>ممتاز</option>
+                <option>متميز</option>
+                <option>جيد جداً</option>
+                <option>جيد</option>
+                <option>يحتاج متابعة</option>
+              </select>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label class="form-label">تعليق المدرّس</label>
+              <textarea name="teacher_comment" class="form-control" rows="4" placeholder="اكتب ملاحظاتك للطالب وأهله..."></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">إنشاء التقرير</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

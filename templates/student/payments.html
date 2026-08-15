@@ -1,0 +1,66 @@
+{% extends "student/_layout.html" %}
+{% block student_title %}المدفوعات{% endblock %}
+{% block student_content %}
+<div class="page-header">
+  <h2><i class="bi bi-cash-coin"></i> المدفوعات</h2>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <small class="text-muted">الرسوم الشهرية</small>
+        <h3 class="text-primary mb-0">{{ monthly }} <small>جنيه</small></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <small class="text-muted">إجمالي المدفوع</small>
+        <h3 class="text-success mb-0">{{ paid|round(0) }} <small>جنيه</small></h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card">
+      <div class="card-body">
+        <small class="text-muted">عدد الدفعات</small>
+        <h3 class="text-info mb-0">{{ payments|length }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header"><i class="bi bi-receipt"></i> سجل الدفعات</div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>التاريخ</th>
+          <th>عن شهر</th>
+          <th>المبلغ</th>
+          <th>الطريقة</th>
+          <th>الحالة</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>{{ p.payment_date }}</td>
+            <td>{{ p.for_month or '—' }}</td>
+            <td><strong class="text-success">{{ p.amount }} ج</strong></td>
+            <td>{{ p.method }}</td>
+            <td>
+              <span class="badge bg-{{ 'success' if p.status == 'مدفوع' else 'warning' }}">{{ p.status }}</span>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">مفيش مدفوعات مسجلة</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

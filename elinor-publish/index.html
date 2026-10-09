@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ELINOR — متجر العطور</title>
+<style>
+:root{
+  --bg:#0b0b0b;--panel:#151515;--panel2:#1b1b1b;--line:#2c2c2c;
+  --gold:#caa43b;--gold2:#ead381;--text:#f7f0e2;--muted:#aaa39a;--danger:#c35b5b;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+body.lock{overflow:hidden}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.container{max-width:1180px;margin:auto;padding:0 18px}
+header{position:sticky;top:0;z-index:40;background:rgba(11,11,11,.94);backdrop-filter:blur(12px);border-bottom:1px solid #242424}
+.nav{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.logo{font-size:29px;font-weight:900;letter-spacing:4px;color:var(--gold)}
+.links{display:flex;gap:18px;font-size:13px;color:#ddd6ca}
+.btn{border:1px solid #3b3b3b;background:#151515;color:#fff;padding:10px 16px;border-radius:999px}
+.btn:hover{border-color:#666}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#111;border-color:var(--gold);font-weight:800}
+.btn.danger{background:#351a1a;border-color:#6e3030;color:#ffb2b2}
+.hero{min-height:520px;padding:56px 0;display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center}
+.hero h1{font-size:56px;line-height:1.08;margin:16px 0}
+.hero p{font-size:17px;line-height:1.9;color:var(--muted);max-width:650px}
+.eyebrow{display:inline-block;padding:7px 12px;border-radius:999px;border:1px solid rgba(202,164,59,.35);color:var(--gold)}
+.hero-card{height:390px;border-radius:34px;background:radial-gradient(circle at 65% 20%,rgba(226,198,105,.3),transparent 26%),linear-gradient(145deg,#2d2517,#0b0b0b 76%);border:1px solid #352d20;position:relative}
+.bottle{position:absolute;width:185px;height:275px;left:50%;top:57%;transform:translate(-50%,-50%);border-radius:42px 42px 62px 62px;background:linear-gradient(180deg,#e1cf93,#ad8a38 48%,#4f3e16 80%,#1c170b)}
+.cap{position:absolute;width:108px;height:58px;left:50%;top:-46px;transform:translateX(-50%);border-radius:14px;background:#131313;border:1px solid #444}
+.label{position:absolute;left:18%;right:18%;top:42%;padding:24px 6px;text-align:center;background:#0d0d0d;color:#e7d17e}
+.section{padding:58px 0}
+.section.alt{background:#0f0f0f;border-top:1px solid #222;border-bottom:1px solid #222}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:20px}
+.head h2{margin:0;font-size:30px}.head p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.categories{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.category{padding:20px;min-height:126px;border-radius:20px;border:1px solid #292929;background:#141414;color:#fff;text-align:right}
+.category.active,.category:hover{border-color:var(--gold)}
+.category strong{display:block;color:var(--gold);font-size:18px;margin-bottom:8px}
+.category small{color:#aaa;line-height:1.7}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.toolbar input{min-width:220px;padding:10px 12px;border:1px solid #343434;background:#111;color:#fff;border-radius:11px}
+.view-btn{width:44px;height:40px;border:1px solid #343434;background:#141414;color:#aaa;border-radius:11px;font-size:18px}
+.view-btn.active{border-color:var(--gold);color:var(--gold)}
+.products{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.products.list{display:flex;flex-direction:column}
+.product{background:#171717;border:1px solid #292929;border-radius:22px;overflow:hidden}
+.products.list .product{display:grid;grid-template-columns:220px 1fr;min-height:220px}
+.product-img{height:220px;background:radial-gradient(circle at 50% 25%,rgba(202,164,59,.22),transparent 34%),linear-gradient(145deg,#272727,#111);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.product-img img{width:100%;height:100%;object-fit:cover}
+.fake-bottle{width:80px;height:130px;border-radius:17px 17px 26px 26px;background:linear-gradient(#d8c786,#82671e)}
+.products.list .product-img{height:100%;min-height:220px}
+.info{padding:17px}
+.products.list .info{padding:25px 28px;display:flex;flex-direction:column;justify-content:center}
+.info h3{margin:0 0 7px}.info p{margin:0;color:#9f9a90;font-size:13px;line-height:1.7}
+.variants{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.variant{padding:7px 10px;border-radius:999px;border:1px solid #3a3a3a;background:transparent;color:#ccc;font-size:11px}
+.variant.active{border-color:var(--gold);color:var(--gold)}
+.price-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.products.list .price-row{justify-content:flex-start}
+.price{font-size:19px;color:var(--gold);font-weight:800}
+.stock{font-size:11px;color:#999}
+.checkout{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+.panel{background:#151515;border:1px solid #292929;border-radius:22px;padding:20px}
+.panel h3{margin:0 0 16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.field{margin-bottom:11px}.field label{display:block;color:#aaa;font-size:12px;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:12px 13px;border-radius:11px;border:1px solid #373737;background:#101010;color:#fff}
+.field textarea{min-height:88px;resize:vertical}
+.summary-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #292929;font-size:13px}
+.summary-row.total{border-bottom:0;font-size:20px;color:var(--gold);font-weight:800}
+.empty{padding:28px;border:1px dashed #444;border-radius:16px;color:#aaa;text-align:center;grid-column:1/-1}
+.drawer-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:70}
+.drawer-bg.show{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(430px,94vw);z-index:80;background:#111;border-right:1px solid #333;transform:translateX(-105%);transition:.25s;padding:18px;overflow:auto}
+.drawer.show{transform:translateX(0)}
+.cart-line{padding:12px 0;border-bottom:1px solid #292929}
+.cart-line-head{display:flex;justify-content:space-between;gap:10px}
+.qty{display:flex;align-items:center;gap:7px;margin-top:8px}
+.qty button{width:28px;height:28px;border-radius:8px;border:1px solid #444;background:#181818;color:#fff}
+.track-card{background:#f2eadc;color:#1d1d1d;border-radius:24px;padding:24px}
+.track-form{display:flex;gap:8px;margin-top:13px}.track-form input{flex:1;padding:12px;border:1px solid #cfc5b3;border-radius:10px}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px}
+.step{padding:12px 8px;border-radius:12px;text-align:center;font-size:11px;background:white;border:1px solid #d9cdb8}
+.step.done{background:#151515;color:white;border-color:#151515}.step.current{background:var(--gold);font-weight:800}
+.toast{position:fixed;right:18px;bottom:18px;z-index:120;background:#171717;border:1px solid #3a3321;color:#fff;padding:12px 15px;border-radius:11px;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+footer{padding:34px 0;border-top:1px solid #252525;color:#8c877f}
+@media(max-width:900px){.links{display:none}.hero{grid-template-columns:1fr}.hero-card{height:330px}.hero h1{font-size:44px}.categories,.products{grid-template-columns:repeat(2,1fr)}.checkout{grid-template-columns:1fr}}
+@media(max-width:650px){.hero{padding-top:36px}.hero h1{font-size:36px}.hero-card{height:290px}.categories,.products,.form-grid{grid-template-columns:1fr}.products.list .product{grid-template-columns:1fr}.head{align-items:flex-start;flex-direction:column}.toolbar,.toolbar input{width:100%}.track-form{flex-direction:column}.timeline{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="logo">ELINOR</div>
+    <nav class="links"><a href="#products">العطور</a><a href="#checkout">إتمام الطلب</a><a href="#track">تتبع الطلب</a></nav>
+    <button class="btn gold" id="openCartBtn">السلة (<span id="cartCount">0</span>)</button>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="container hero">
+    <div>
+      <span class="eyebrow">ELINOR Perfumes</span>
+      <h1>عطر يليق بحضورك.</h1>
+      <p>اختار البرفان والحجم، أضفه للسلة، اختار المحافظة وشركة الشحن، وشوف التكلفة النهائية فورًا قبل تأكيد الطلب.</p>
+      <button class="btn gold" id="shopNowBtn">تسوق الآن</button>
+    </div>
+    <div class="hero-card"><div class="bottle"><div class="cap"></div><div class="label"><b>ELINOR</b></div></div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="head"><div><h2>تسوق حسب القسم</h2><p>اختار القسم لعرض منتجاته</p></div></div>
+    <div class="categories" id="categories"></div>
+  </div>
+</section>
+
+<section class="section alt" id="products">
+  <div class="container">
+    <div class="head">
+      <div><h2>العطور</h2><p id="productsMeta"></p></div>
+      <div class="toolbar">
+        <input id="searchInput" placeholder="ابحث باسم العطر...">
+        <button class="view-btn" id="gridBtn">▦</button>
+        <button class="view-btn" id="listBtn">☷</button>
+      </div>
+    </div>
+    <div class="products" id="productsGrid"></div>
+  </div>
+</section>
+
+<section class="section" id="checkout">
+  <div class="container">
+    <div class="head"><div><h2>إتمام الطلب</h2><p>الشحن حسب المحافظة وشركة الشحن</p></div></div>
+    <div class="checkout">
+      <div class="panel">
+        <h3>بيانات العميل</h3>
+        <div class="form-grid">
+          <div class="field"><label>الاسم</label><input id="customerName"></div>
+          <div class="field"><label>رقم الهاتف</label><input id="customerPhone"></div>
+          <div class="field"><label>المحافظة</label><select id="provinceSelect"></select></div>
+          <div class="field"><label>شركة الشحن</label><select id="carrierSelect"></select></div>
+        </div>
+        <div class="field"><label>العنوان بالتفصيل</label><textarea id="customerAddress"></textarea></div>
+      </div>
+      <div class="panel">
+        <h3>ملخص الطلب</h3>
+        <div id="checkoutItems"></div>
+        <div class="summary-row"><span>الشحن</span><b id="shippingCost">0 ج</b></div>
+        <div class="summary-row total"><span>الإجمالي</span><span id="grandTotal">0 ج</span></div>
+        <button class="btn gold" style="width:100%;margin-top:12px" id="confirmOrderBtn">تأكيد الطلب</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="track">
+  <div class="container">
+    <div class="track-card">
+      <h3 style="margin:0 0 5px">تتبع الطلب</h3>
+      <div>جرّب مثلًا EL-2001 بعد إنشاء الطلب، أو استخدم أرقام الطلبات التجريبية.</div>
+      <div class="track-form"><input id="trackInput" placeholder="رقم الطلب"><button class="btn gold" id="trackBtn">تتبع</button></div>
+      <div id="trackText" style="margin-top:12px;font-size:13px"></div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="cartDrawer">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h3>سلة التسوق</h3><button class="btn" id="closeCartBtn">إغلاق</button></div>
+  <div id="cartItems"></div>
+  <div class="summary-row total"><span>إجمالي المنتجات</span><span id="cartSubtotal">0 ج</span></div>
+  <button class="btn gold" style="width:100%;margin-top:12px" id="goCheckoutBtn">إتمام الطلب</button>
+</aside>
+
+<div class="toast" id="toast"></div>
+<footer><div class="container"><div class="logo">ELINOR</div><small>ELINOR Perfumes Store</small></div></footer>
+
+<script>
+"use strict";
+const STORAGE_KEY = "elinor_demo_v6";
+const GOVS = ["بورسعيد","القاهرة","الجيزة","الإسكندرية","الدقهلية","الشرقية","الإسماعيلية","السويس","دمياط","كفر الشيخ","الغربية","المنوفية","البحيرة","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","مطروح","شمال سيناء","جنوب سيناء"];
+const STATUS_STEPS = ["تم الاستلام","تم التأكيد","جاري التجهيز","خرج للشحن","تم التسليم"];
+const DEFAULT_STATE = {
+  categories:["رجالي","نسائي","Unisex","العروض"],
+  products:[
+    {id:1,name:"Midnight Oud",category:"رجالي",desc:"شرقي فاخر بلمسة عود دافئة وثبات قوي.",image:"",variants:[{size:"30 ml",price:280,stock:12},{size:"50 ml",price:350,stock:18},{size:"100 ml",price:590,stock:7}]},
+    {id:2,name:"Velvet Rose",category:"نسائي",desc:"ورد مخملي ناعم ومتوازن للاستخدام اليومي.",image:"",variants:[{size:"30 ml",price:250,stock:14},{size:"50 ml",price:330,stock:20}]},
+    {id:3,name:"Blue Icon",category:"رجالي",desc:"منعش وحيوي ومناسب لكل الأوقات.",image:"",variants:[{size:"50 ml",price:300,stock:17},{size:"100 ml",price:520,stock:9}]},
+    {id:4,name:"Amber Code",category:"Unisex",desc:"عنبر فاخر مع لمسة خشبية عميقة.",image:"",variants:[{size:"30 ml",price:320,stock:11},{size:"50 ml",price:410,stock:8}]}
+  ],
+  carriers:[
+    {id:"c1",name:"إلينور للتوصيل",active:true,insidePortSaid:50,outsidePortSaid:85,overrides:{"القاهرة":75,"الإسكندرية":80}},
+    {id:"c2",name:"Bosta",active:true,insidePortSaid:60,outsidePortSaid:95,overrides:{"القاهرة":90,"الجيزة":90}}
+  ],
+  defaultCarrierId:"c1",
+  defaultView:"list",
+  orders:[
+    {id:"EL-1840",date:"2026-10-08",customer:"محمد السيد",phone:"01000000003",province:"الإسكندرية",address:"سموحة",carrierId:"c1",status:"تم التسليم",items:[{name:"Velvet Rose",size:"50 ml",qty:2,price:330}],shipping:80,total:740},
+    {id:"EL-1841",date:"2026-10-09",customer:"منى علي",phone:"01000000002",province:"القاهرة",address:"مدينة نصر",carrierId:"c2",status:"خرج للشحن",items:[{name:"Blue Icon",size:"100 ml",qty:2,price:520}],shipping:90,total:1130}
+  ],
+  nextOrderNumber:2001
+};
+function deepClone(v){return JSON.parse(JSON.stringify(v));}
+function storageGet(){try{return localStorage.getItem(STORAGE_KEY);}catch(err){return null;}}
+function storageSet(value){try{localStorage.setItem(STORAGE_KEY,value);return true;}catch(err){return false;}}
+function loadState(){
+  const raw=storageGet();
+  if(!raw){const s=deepClone(DEFAULT_STATE);storageSet(JSON.stringify(s));return s;}
+  try{return JSON.parse(raw);}catch(err){return deepClone(DEFAULT_STATE);}
+}
+function saveState(){storageSet(JSON.stringify(state));}
+const $=id=>document.getElementById(id);
+let state=loadState();
+let currentCategory="الكل";
+let searchTerm="";
+let selectedVariant={};
+let cart=[];
+let viewMode=state.defaultView || "list";
+
+function money(v){return `${Number(v||0)} ج`;}
+function showToast(msg){const el=$("toast");el.textContent=msg;el.classList.add("show");setTimeout(()=>el.classList.remove("show"),1700);}
+function activeCarriers(){return (state.carriers||[]).filter(c=>c.active);}
+function carrierById(id){return (state.carriers||[]).find(c=>c.id===id);}
+function shippingFor(carrier,province){
+  if(!carrier)return 0;
+  if(province==="بورسعيد")return Number(carrier.insidePortSaid||0);
+  if(carrier.overrides && Object.prototype.hasOwnProperty.call(carrier.overrides,province))return Number(carrier.overrides[province]||0);
+  return Number(carrier.outsidePortSaid||0);
+}
+function renderCategories(){
+  const all=["الكل",...(state.categories||[])];
+  $("categories").innerHTML=all.map(c=>`<button class="category ${c===currentCategory?"active":""}" data-category="${c}"><strong>${c}</strong><small>${c==="الكل"?"كل منتجات ELINOR":"اضغط لعرض منتجات القسم"}</small></button>`).join("");
+}
+function filteredProducts(){
+  return (state.products||[]).filter(p=>{
+    const catOk=currentCategory==="الكل" || p.category===currentCategory;
+    const searchOk=p.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return catOk && searchOk;
+  });
+}
+function renderProducts(){
+  const list=filteredProducts();
+  $("productsGrid").classList.toggle("list",viewMode==="list");
+  $("gridBtn").classList.toggle("active",viewMode==="grid");
+  $("listBtn").classList.toggle("active",viewMode==="list");
+  $("productsMeta").textContent=`${list.length} منتج`;
+  if(!list.length){$("productsGrid").innerHTML='<div class="empty">لا توجد منتجات مطابقة.</div>';return;}
+  $("productsGrid").innerHTML=list.map(p=>{
+    const safeIndex=Math.min(selectedVariant[p.id]??0,p.variants.length-1);
+    const v=p.variants[safeIndex];
+    const visual=p.image?`<img src="${p.image}" alt="${p.name}">`:'<div class="fake-bottle"></div>';
+    return `<article class="product">
+      <div class="product-img">${visual}</div>
+      <div class="info">
+        <h3>${p.name}</h3><p>${p.desc||""}</p>
+        <div class="variants">${p.variants.map((x,i)=>`<button class="variant ${i===safeIndex?"active":""}" data-variant-product="${p.id}" data-variant-index="${i}">${x.size}</button>`).join("")}</div>
+        <div class="price-row"><div><div class="price">${money(v.price)}</div><div class="stock">${v.stock>0?`متاح: ${v.stock}`:"غير متاح"}</div></div>
+        <button class="btn gold add-cart" data-add-product="${p.id}" ${v.stock<=0?"disabled":""}>أضف للسلة</button></div>
+      </div>
+    </article>`;
+  }).join("");
+}
+function addToCart(productId){
+  const product=(state.products||[]).find(p=>p.id===productId); if(!product)return;
+  const vi=Math.min(selectedVariant[productId]??0,product.variants.length-1);
+  const variant=product.variants[vi]; if(!variant || variant.stock<=0){showToast("هذا الحجم غير متاح");return;}
+  const key=`${productId}:${vi}`;
+  const existing=cart.find(i=>i.key===key);
+  if(existing)existing.qty+=1;
+  else cart.push({key,productId,variantIndex:vi,name:product.name,size:variant.size,price:Number(variant.price),qty:1});
+  renderCart();
+  showToast("تمت الإضافة إلى السلة");
+}
+function renderCart(){
+  $("cartCount").textContent=cart.reduce((s,i)=>s+i.qty,0);
+  if(!cart.length)$("cartItems").innerHTML='<div class="empty">السلة فارغة.</div>';
+  else $("cartItems").innerHTML=cart.map(i=>`<div class="cart-line">
+    <div class="cart-line-head"><div><b>${i.name}</b><div class="stock">${i.size} — ${money(i.price)}</div></div><button class="btn danger remove-cart" data-remove-key="${i.key}">حذف</button></div>
+    <div class="qty"><button data-qty-key="${i.key}" data-qty-action="plus">+</button><span>${i.qty}</span><button data-qty-key="${i.key}" data-qty-action="minus">−</button></div>
+  </div>`).join("");
+  $("cartSubtotal").textContent=money(cart.reduce((s,i)=>s+i.price*i.qty,0));
+  renderCheckout();
+}
+function renderCarrierSelect(){
+  const carriers=activeCarriers();
+  if(!carriers.length){$("carrierSelect").innerHTML='<option value="">لا توجد شركة شحن مفعلة</option>';return;}
+  $("carrierSelect").innerHTML=carriers.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+  if(carriers.some(c=>c.id===state.defaultCarrierId))$("carrierSelect").value=state.defaultCarrierId;
+}
+function renderCheckout(){
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const carrier=carrierById($("carrierSelect").value);
+  const ship=cart.length?shippingFor(carrier,$("provinceSelect").value):0;
+  if(!cart.length)$("checkoutItems").innerHTML='<div class="summary-row"><span>لا توجد منتجات في السلة</span><b>0 ج</b></div>';
+  else $("checkoutItems").innerHTML=cart.map(i=>`<div class="summary-row"><span>${i.name} — ${i.size} × ${i.qty}</span><b>${money(i.price*i.qty)}</b></div>`).join("");
+  $("shippingCost").textContent=money(ship);
+  $("grandTotal").textContent=money(subtotal+ship);
+}
+function createOrder(){
+  if(!cart.length){showToast("أضف منتجًا إلى السلة أولًا");return;}
+  const customer=$("customerName").value.trim(), phone=$("customerPhone").value.trim(), address=$("customerAddress").value.trim();
+  if(!customer || !phone || !address){showToast("أكمل الاسم والهاتف والعنوان");return;}
+  const carrier=carrierById($("carrierSelect").value);
+  if(!carrier){showToast("اختر شركة شحن");return;}
+  const province=$("provinceSelect").value;
+  const shipping=shippingFor(carrier,province);
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const orderId=`EL-${state.nextOrderNumber||2001}`;
+  state.nextOrderNumber=(state.nextOrderNumber||2001)+1;
+  state.orders=state.orders||[];
+  state.orders.push({
+    id:orderId,date:new Date().toISOString().slice(0,10),customer,phone,province,address,
+    carrierId:carrier.id,status:"تم الاستلام",
+    items:cart.map(i=>({name:i.name,size:i.size,qty:i.qty,price:i.price})),
+    shipping,total:subtotal+shipping
+  });
+  saveState();
+  cart=[];
+  renderCart();
+  $("trackInput").value=orderId;
+  showToast(`تم إنشاء الطلب ${orderId}`);
+  $("track").scrollIntoView({behavior:"smooth"});
+}
+function renderTrack(order){
+  const idx=STATUS_STEPS.indexOf(order.status);
+  $("trackText").textContent=`${order.id} — ${order.customer} — الحالة: ${order.status}`;
+  $("timeline").innerHTML=STATUS_STEPS.map((s,i)=>`<div class="step ${i<idx?"done":i===idx?"current":""}">${s}</div>`).join("");
+}
+function trackOrder(){
+  const code=$("trackInput").value.trim().toUpperCase();
+  const order=(state.orders||[]).find(o=>o.id.toUpperCase()===code);
+  if(!order){$("trackText").textContent="رقم الطلب غير موجود."; $("timeline").innerHTML=""; return;}
+  renderTrack(order);
+}
+function openCart(){document.body.classList.add("lock");$("drawerBg").classList.add("show");$("cartDrawer").classList.add("show");}
+function closeCart(){document.body.classList.remove("lock");$("drawerBg").classList.remove("show");$("cartDrawer").classList.remove("show");}
+
+$("categories").addEventListener("click",e=>{const b=e.target.closest("[data-category]");if(!b)return;currentCategory=b.dataset.category;renderCategories();renderProducts();$("products").scrollIntoView({behavior:"smooth"});});
+$("searchInput").addEventListener("input",e=>{searchTerm=e.target.value;renderProducts();});
+$("productsGrid").addEventListener("click",e=>{
+  const v=e.target.closest("[data-variant-product]");
+  if(v){selectedVariant[Number(v.dataset.variantProduct)]=Number(v.dataset.variantIndex);renderProducts();return;}
+  const a=e.target.closest("[data-add-product]");
+  if(a)addToCart(Number(a.dataset.addProduct));
+});
+$("gridBtn").addEventListener("click",()=>{viewMode="grid";renderProducts();});
+$("listBtn").addEventListener("click",()=>{viewMode="list";renderProducts();});
+$("cartItems").addEventListener("click",e=>{
+  const q=e.target.closest("[data-qty-key]");
+  if(q){const item=cart.find(i=>i.key===q.dataset.qtyKey);if(!item)return;q.dataset.qtyAction==="plus"?item.qty++:item.qty--;if(item.qty<=0)cart=cart.filter(i=>i.key!==item.key);renderCart();return;}
+  const r=e.target.closest("[data-remove-key]");if(r){cart=cart.filter(i=>i.key!==r.dataset.removeKey);renderCart();}
+});
+$("openCartBtn").addEventListener("click",openCart);
+$("closeCartBtn").addEventListener("click",closeCart);
+$("drawerBg").addEventListener("click",closeCart);
+$("goCheckoutBtn").addEventListener("click",()=>{closeCart();$("checkout").scrollIntoView({behavior:"smooth"});});
+$("provinceSelect").addEventListener("change",renderCheckout);
+$("carrierSelect").addEventListener("change",renderCheckout);
+$("confirmOrderBtn").addEventListener("click",createOrder);
+$("trackBtn").addEventListener("click",trackOrder);
+$("shopNowBtn").addEventListener("click",()=>$("products").scrollIntoView({behavior:"smooth"}));
+
+$("provinceSelect").innerHTML=GOVS.map(g=>`<option value="${g}">${g}</option>`).join("");
+renderCarrierSelect();
+renderCategories();
+renderProducts();
+renderCart();
+$("timeline").innerHTML="";
+window.addEventListener("storage",()=>{state=loadState();viewMode=state.defaultView||viewMode;renderCarrierSelect();renderCategories();renderProducts();renderCheckout();});
+</script>
+</body>
+</html>

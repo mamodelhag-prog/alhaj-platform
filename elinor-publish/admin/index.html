@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ELINOR Admin — لوحة الإدارة</title>
+<style>
+:root{
+  --bg:#f4f1ea;--side:#111;--card:#fff;--gold:#c9a23b;--text:#1a1a1a;--muted:#767676;
+  --line:#e5ded1;--soft:#faf8f3;--green:#4f7d3b;--blue:#2f5d8d;--red:#9b4141;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:275px 1fr}
+aside{background:#111;color:#ddd;padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.logo{font-size:28px;font-weight:900;color:var(--gold);margin-bottom:24px}
+.menu button,.mobile-menu button{width:100%;padding:12px 13px;border-radius:11px;border:0;background:transparent;color:#bbb;text-align:right;margin:5px 0}
+.menu button.active,.menu button:hover,.mobile-menu button.active{background:#1e1e1e;color:#fff}
+.sidebar-note{margin-top:18px;background:#181818;color:#888;border-radius:12px;padding:12px;font-size:12px;line-height:1.7}
+main{padding:26px;overflow:auto}
+.mobile-nav{display:none;position:sticky;top:0;z-index:50;background:#111;border-bottom:1px solid #222;padding:8px}
+.mobile-menu{display:flex;gap:7px;overflow-x:auto}.mobile-menu button{width:auto;white-space:nowrap;padding:10px 12px;text-align:center;margin:0}
+.view{display:none}.view.active{display:block}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.top h1{margin:0;font-size:29px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.btn{border:0;border-radius:10px;padding:10px 14px;background:#191919;color:#fff}
+.btn.gold{background:var(--gold);color:#111;font-weight:800}.btn.light{background:#eee;color:#222}.btn.red{background:#a34a4a}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:17px}
+.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:0 7px 22px rgba(0,0,0,.035)}
+.card span{font-size:12px;color:#777}.card strong{display:block;font-size:25px;margin:8px 0 2px}.card small{color:#888}
+.panel{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;margin-bottom:16px}
+.panel-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.panel-title h2{margin:0;font-size:18px}
+.grid{display:grid;grid-template-columns:1.4fr .85fr;gap:16px}.grid.two{grid-template-columns:1fr 1fr}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+th,td{padding:11px 8px;border-bottom:1px solid #eee;text-align:right;vertical-align:middle}th{color:#777;font-size:11px}
+.status{display:inline-block;padding:6px 9px;border-radius:999px;font-size:11px;background:#f2ead3;color:#785f18}.status.green{background:#e5f1df;color:#477936}.status.blue{background:#e3edf8;color:#2f5d8d}.status.red{background:#f7e2e2;color:#963b3b}.status.gray{background:#ededed;color:#666}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input,.toolbar select{padding:9px 10px;border:1px solid #ddd;border-radius:9px;background:#fff}
+.field{margin-bottom:11px}.field label{display:block;font-size:12px;color:#777;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:10px;border-radius:9px;border:1px solid #ddd;background:#fff}.field textarea{min-height:78px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.order-card{padding:11px;border-radius:11px;background:var(--soft);border:1px solid #eee5d8;margin-bottom:8px}
+.progress{height:8px;background:#eee;border-radius:999px;overflow:hidden}.progress span{display:block;height:100%;background:var(--gold)}
+.product-card,.carrier-card{border:1px solid #e7e0d3;border-radius:15px;padding:14px;margin-bottom:11px;background:#fff}
+.variant-table{width:100%;min-width:0;margin-top:8px}.variant-table input{width:100%;padding:7px;border:1px solid #ddd;border-radius:7px}
+.category-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:11px;background:var(--soft);border-radius:11px;margin-bottom:8px}
+.carrier-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.override-row{display:grid;grid-template-columns:1fr 110px auto;gap:7px;align-items:center;padding:7px 0;border-bottom:1px solid #eee}
+.notice{padding:11px;border-radius:10px;background:#fff6da;border:1px solid #ead9a7;color:#6d591b;font-size:12px;margin-bottom:12px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:80}.modal-bg.show{display:block}
+.modal{display:none;position:fixed;z-index:90;top:50%;left:50%;transform:translate(-50%,-50%);width:min(760px,93vw);max-height:88vh;overflow:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 30px 90px rgba(0,0,0,.25)}.modal.show{display:block}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.toast{position:fixed;bottom:18px;left:18px;z-index:120;background:#111;color:#fff;padding:11px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:none}
+@media(max-width:1080px){.cards{grid-template-columns:repeat(2,1fr)}.grid,.grid.two{grid-template-columns:1fr}}
+@media(max-width:860px){.app{display:block}.app>aside{display:none}.mobile-nav{display:block}main{padding:16px}.carrier-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.cards,.form-row{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.override-row{grid-template-columns:1fr}.toolbar>*{width:100%}}
+</style>
+</head>
+<body>
+
+<div class="mobile-nav">
+  <div class="mobile-menu" id="mobileMenu">
+    <button data-view="dashboard">الرئيسية</button>
+    <button data-view="orders">الطلبات</button>
+    <button data-view="revenue">الإيرادات</button>
+    <button data-view="products">المنتجات</button>
+    <button data-view="categories">الأقسام</button>
+    <button data-view="shipping">الشحن</button>
+    <button data-view="settings">الإعدادات</button>
+  </div>
+</div>
+
+<div class="app">
+<aside>
+  <div class="logo">ELINOR Admin</div>
+  <nav class="menu" id="desktopMenu">
+    <button data-view="dashboard" class="active">لوحة التحكم</button>
+    <button data-view="orders">الطلبات</button>
+    <button data-view="revenue">الإيرادات</button>
+    <button data-view="products">المنتجات</button>
+    <button data-view="categories">الأقسام</button>
+    <button data-view="shipping">شركات الشحن</button>
+    <button data-view="settings">إعدادات المتجر</button>
+  </nav>
+  <div class="sidebar-note">التنقل شغال على الكمبيوتر والموبايل. الطلبات التي تنشئها من المتجر تظهر هنا داخل نفس المتصفح.</div>
+</aside>
+
+<main>
+<section class="view active" id="dashboard">
+  <div class="top"><div><h1>لوحة التحكم</h1><p>ملخص أداء ELINOR</p></div><button class="btn gold" data-jump="orders">عرض الطلبات</button></div>
+  <div class="cards">
+    <div class="card"><span>إجمالي الطلبات</span><strong id="kpiOrders">0</strong></div>
+    <div class="card"><span>طلبات اليوم</span><strong id="kpiToday">0</strong></div>
+    <div class="card"><span>جاري التجهيز</span><strong id="kpiPreparing">0</strong></div>
+    <div class="card"><span>خرج للشحن</span><strong id="kpiShipped">0</strong></div>
+    <div class="card"><span>الإيرادات</span><strong id="kpiRevenue">0 ج</strong><small>الطلبات المسلمة فقط</small></div>
+  </div>
+  <div class="grid">
+    <div class="panel"><div class="panel-title"><h2>أحدث الطلبات</h2></div><div id="latestOrders"></div></div>
+    <div class="panel"><div class="panel-title"><h2>توزيع الحالات</h2></div><div id="statusStats"></div></div>
+  </div>
+</section>
+
+<section class="view" id="orders">
+  <div class="top"><div><h1>الطلبات</h1><p>فلترة، تعديل الحالة، وعرض التفاصيل</p></div></div>
+  <div class="panel">
+    <div class="toolbar">
+      <input id="orderSearch" placeholder="رقم الطلب أو اسم العميل">
+      <select id="statusFilter"><option value="">كل الحالات</option><option>تم الاستلام</option><option>تم التأكيد</option><option>جاري التجهيز</option><option>جاهز للشحن</option><option>خرج للشحن</option><option>تم التسليم</option><option>ملغي</option></select>
+      <select id="carrierFilter"><option value="">كل شركات الشحن</option></select>
+    </div>
+    <div class="table-wrap" id="ordersTable"></div>
+  </div>
+</section>
+
+<section class="view" id="revenue">
+  <div class="top"><div><h1>الإيرادات</h1><p>الأرقام محسوبة من الطلبات المسلمة</p></div></div>
+  <div class="cards">
+    <div class="card"><span>إجمالي الإيرادات</span><strong id="revTotal">0 ج</strong></div>
+    <div class="card"><span>متوسط الطلب</span><strong id="revAvg">0 ج</strong></div>
+    <div class="card"><span>طلبات مسلمة</span><strong id="revDelivered">0</strong></div>
+    <div class="card"><span>إيراد الشحن</span><strong id="revShipping">0 ج</strong></div>
+    <div class="card"><span>قيمة المنتجات</span><strong id="revProducts">0 ج</strong></div>
+  </div>
+  <div class="grid two">
+    <div class="panel"><div class="panel-title"><h2>أعلى الطلبات</h2></div><div id="topOrders"></div></div>
+    <div class="panel"><div class="panel-title"><h2>الإيرادات حسب المحافظة</h2></div><div id="provinceRevenue"></div></div>
+  </div>
+</section>
+
+<section class="view" id="products">
+  <div class="top"><div><h1>المنتجات</h1><p>اسم، قسم، وصف، صورة، أحجام، أسعار، ومخزون</p></div></div>
+  <div class="grid">
+    <div class="panel"><div class="panel-title"><h2>المنتجات الحالية</h2><small id="productCount"></small></div><div id="productsList"></div></div>
+    <div class="panel">
+      <div class="panel-title"><h2>إضافة منتج</h2></div>
+      <div class="field"><label>الاسم</label><input id="newProductName"></div>
+      <div class="field"><label>الوصف</label><textarea id="newProductDesc"></textarea></div>
+      <div class="field"><label>القسم</label><select id="newProductCategory"></select></div>
+      <div class="form-row">
+        <div class="field"><label>الحجم الأول</label><input id="newProductSize" placeholder="50 ml"></div>
+        <div class="field"><label>السعر</label><input id="newProductPrice" type="number"></div>
+      </div>
+      <div class="field"><label>المخزون</label><input id="newProductStock" type="number"></div>
+      <div class="field"><label>الصورة</label><input id="newProductImage" type="file" accept="image/*"></div>
+      <button class="btn gold" style="width:100%" id="addProductBtn">إضافة المنتج</button>
+    </div>
+  </div>
+</section>
+
+<section class="view" id="categories">
+  <div class="top"><div><h1>الأقسام</h1><p>إضافة وحذف أقسام المتجر</p></div></div>
+  <div class="panel">
+    <div class="form-row">
+      <div class="field"><label>اسم القسم</label><input id="newCategoryName"></div>
+      <div style="display:flex;align-items:end"><button class="btn gold" id="addCategoryBtn">إضافة القسم</button></div>
+    </div>
+    <div id="categoryList"></div>
+  </div>
+</section>
+
+<section class="view" id="shipping">
+  <div class="top"><div><h1>شركات الشحن</h1><p>سعر داخل بورسعيد، خارج بورسعيد، وسعر خاص لكل محافظة</p></div><button class="btn gold" id="openCarrierModalBtn">+ إضافة شركة شحن</button></div>
+  <div class="notice">كل شركة لها تسعير مستقل. بورسعيد تستخدم سعر "داخل بورسعيد". المحافظات الأخرى تستخدم سعر "خارج بورسعيد" إلا إذا وضعت لها سعرًا خاصًا.</div>
+  <div id="carrierList"></div>
+</section>
+
+<section class="view" id="settings">
+  <div class="top"><div><h1>إعدادات المتجر</h1><p>إعدادات العرض الافتراضية</p></div></div>
+  <div class="panel">
+    <div class="panel-title"><h2>طريقة عرض المنتجات</h2></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn light" data-default-view="grid">▦ Grid</button>
+      <button class="btn light" data-default-view="list">☷ List</button>
+    </div>
+    <div class="notice" style="margin-top:12px" id="viewModeNote"></div>
+  </div>
+  <div class="panel"><button class="btn red" id="resetBtn">استرجاع البيانات الافتراضية الافتراضية</button></div>
+</section>
+</main>
+</div>
+
+<div class="modal-bg" id="modalBg"></div>
+<div class="modal" id="orderModal">
+  <div class="modal-head"><h2 id="orderModalTitle">تفاصيل الطلب</h2><button class="btn light" id="closeOrderModalBtn">إغلاق</button></div>
+  <div id="orderModalBody"></div>
+</div>
+<div class="modal" id="carrierModal">
+  <div class="modal-head"><h2>إضافة شركة شحن</h2><button class="btn light" id="closeCarrierModalBtn">إغلاق</button></div>
+  <div class="field"><label>اسم الشركة</label><input id="carrierNameInput"></div>
+  <div class="form-row">
+    <div class="field"><label>داخل بورسعيد</label><input id="carrierInsideInput" type="number"></div>
+    <div class="field"><label>خارج بورسعيد</label><input id="carrierOutsideInput" type="number"></div>
+  </div>
+  <button class="btn gold" id="addCarrierBtn">إضافة الشركة</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const STORAGE_KEY="elinor_demo_v6";
+const GOVS=["بورسعيد","القاهرة","الجيزة","الإسكندرية","الدقهلية","الشرقية","الإسماعيلية","السويس","دمياط","كفر الشيخ","الغربية","المنوفية","البحيرة","الفيوم","بني سويف","المنيا","أسيوط","سوهاج","قنا","الأقصر","أسوان","البحر الأحمر","الوادي الجديد","مطروح","شمال سيناء","جنوب سيناء"];
+const DEFAULT_STATE={
+  categories:["رجالي","نسائي","Unisex","العروض"],
+  products:[
+    {id:1,name:"Midnight Oud",category:"رجالي",desc:"شرقي فاخر بلمسة عود دافئة وثبات قوي.",image:"",variants:[{size:"30 ml",price:280,stock:12},{size:"50 ml",price:350,stock:18},{size:"100 ml",price:590,stock:7}]},
+    {id:2,name:"Velvet Rose",category:"نسائي",desc:"ورد مخملي ناعم ومتوازن للاستخدام اليومي.",image:"",variants:[{size:"30 ml",price:250,stock:14},{size:"50 ml",price:330,stock:20}]},
+    {id:3,name:"Blue Icon",category:"رجالي",desc:"منعش وحيوي ومناسب لكل الأوقات.",image:"",variants:[{size:"50 ml",price:300,stock:17},{size:"100 ml",price:520,stock:9}]},
+    {id:4,name:"Amber Code",category:"Unisex",desc:"عنبر فاخر مع لمسة خشبية عميقة.",image:"",variants:[{size:"30 ml",price:320,stock:11},{size:"50 ml",price:410,stock:8}]}
+  ],
+  carriers:[
+    {id:"c1",name:"إلينور للتوصيل",active:true,insidePortSaid:50,outsidePortSaid:85,overrides:{"القاهرة":75,"الإسكندرية":80}},
+    {id:"c2",name:"Bosta",active:true,insidePortSaid:60,outsidePortSaid:95,overrides:{"القاهرة":90,"الجيزة":90}}
+  ],
+  defaultCarrierId:"c1",
+  defaultView:"list",
+  orders:[
+    {id:"EL-1840",date:"2026-10-08",customer:"محمد السيد",phone:"01000000003",province:"الإسكندرية",address:"سموحة",carrierId:"c1",status:"تم التسليم",items:[{name:"Velvet Rose",size:"50 ml",qty:2,price:330}],shipping:80,total:740},
+    {id:"EL-1841",date:"2026-10-09",customer:"منى علي",phone:"01000000002",province:"القاهرة",address:"مدينة نصر",carrierId:"c2",status:"خرج للشحن",items:[{name:"Blue Icon",size:"100 ml",qty:2,price:520}],shipping:90,total:1130},
+    {id:"EL-1842",date:"2026-10-09",customer:"أحمد محمد",phone:"01000000001",province:"بورسعيد",address:"بورفؤاد",carrierId:"c1",status:"جاري التجهيز",items:[{name:"Midnight Oud",size:"50 ml",qty:1,price:350}],shipping:50,total:400}
+  ],
+  nextOrderNumber:2001
+};
+function clone(v){return JSON.parse(JSON.stringify(v));}
+function storageGet(){try{return localStorage.getItem(STORAGE_KEY);}catch(err){return null;}}
+function storageSet(value){try{localStorage.setItem(STORAGE_KEY,value);return true;}catch(err){return false;}}
+function loadState(){const raw=storageGet();if(!raw){const s=clone(DEFAULT_STATE);storageSet(JSON.stringify(s));return s;}try{return JSON.parse(raw);}catch(err){return clone(DEFAULT_STATE);}}
+function saveState(message){storageSet(JSON.stringify(state));renderAll();if(message)toast(message);}
+const $=id=>document.getElementById(id);
+let state=loadState();
+let currentView="dashboard";
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600);}
+function showView(id){currentView=id;document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===id));window.scrollTo({top:0,behavior:"smooth"});}
+function carrierName(id){return (state.carriers||[]).find(c=>c.id===id)?.name || "غير محدد";}
+function statusClass(s){if(s==="تم التسليم")return"green";if(s==="خرج للشحن")return"blue";if(s==="ملغي")return"red";if(s==="تم الاستلام")return"gray";return"";}
+function renderDashboard(){
+  const orders=state.orders||[];
+  const delivered=orders.filter(o=>o.status==="تم التسليم");
+  $("kpiOrders").textContent=orders.length;
+  $("kpiToday").textContent=orders.filter(o=>o.date===new Date().toISOString().slice(0,10) || o.date==="2026-10-09").length;
+  $("kpiPreparing").textContent=orders.filter(o=>o.status==="جاري التجهيز").length;
+  $("kpiShipped").textContent=orders.filter(o=>o.status==="خرج للشحن").length;
+  $("kpiRevenue").textContent=`${delivered.reduce((s,o)=>s+Number(o.total||0),0)} ج`;
+  $("latestOrders").innerHTML=[...orders].reverse().slice(0,5).map(o=>`<div class="order-card"><b>${o.id} — ${o.customer}</b><div style="margin-top:4px;color:#777;font-size:12px">${o.province} • ${o.total} ج • ${carrierName(o.carrierId)}</div><div style="margin-top:6px"><span class="status ${statusClass(o.status)}">${o.status}</span></div></div>`).join("") || '<div class="notice">لا توجد طلبات.</div>';
+  const statuses=["تم الاستلام","تم التأكيد","جاري التجهيز","جاهز للشحن","خرج للشحن","تم التسليم","ملغي"];
+  $("statusStats").innerHTML=statuses.map(s=>{const n=orders.filter(o=>o.status===s).length;const p=orders.length?Math.round(n/orders.length*100):0;return `<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span>${s}</span><b>${n}</b></div><div class="progress"><span style="width:${p}%"></span></div></div>`}).join("");
+}
+function renderCarrierFilter(){const current=$("carrierFilter").value;$("carrierFilter").innerHTML='<option value="">كل شركات الشحن</option>'+(state.carriers||[]).map(c=>`<option value="${c.id}">${c.name}</option>`).join("");$("carrierFilter").value=current;}
+function filteredOrders(){const q=$("orderSearch").value.trim().toLowerCase(),status=$("statusFilter").value,carrier=$("carrierFilter").value;return (state.orders||[]).filter(o=>(!q||o.id.toLowerCase().includes(q)||o.customer.toLowerCase().includes(q))&&(!status||o.status===status)&&(!carrier||o.carrierId===carrier));}
+function renderOrders(){
+  renderCarrierFilter();
+  const rows=filteredOrders();
+  $("ordersTable").innerHTML=`<table><thead><tr><th>الطلب</th><th>التاريخ</th><th>العميل</th><th>المحافظة</th><th>شركة الشحن</th><th>الإجمالي</th><th>الحالة</th><th></th></tr></thead><tbody>${rows.map(o=>`<tr>
+    <td>${o.id}</td><td>${o.date}</td><td>${o.customer}</td><td>${o.province}</td><td>${carrierName(o.carrierId)}</td><td>${o.total} ج</td>
+    <td><select data-order-status="${o.id}">${["تم الاستلام","تم التأكيد","جاري التجهيز","جاهز للشحن","خرج للشحن","تم التسليم","ملغي"].map(s=>`<option ${s===o.status?"selected":""}>${s}</option>`).join("")}</select></td>
+    <td><button class="btn light" data-order-details="${o.id}">تفاصيل</button></td>
+  </tr>`).join("")}</tbody></table>`;
+}
+function renderRevenue(){
+  const delivered=(state.orders||[]).filter(o=>o.status==="تم التسليم");
+  const total=delivered.reduce((s,o)=>s+Number(o.total||0),0);
+  const ship=delivered.reduce((s,o)=>s+Number(o.shipping||0),0);
+  $("revTotal").textContent=`${total} ج`;$("revAvg").textContent=`${delivered.length?Math.round(total/delivered.length):0} ج`;$("revDelivered").textContent=delivered.length;$("revShipping").textContent=`${ship} ج`;$("revProducts").textContent=`${total-ship} ج`;
+  $("topOrders").innerHTML=[...delivered].sort((a,b)=>b.total-a.total).map(o=>`<div class="order-card"><b>${o.id} — ${o.total} ج</b><div style="color:#777;font-size:12px">${o.customer} • ${o.province}</div></div>`).join("")||'<div class="notice">لا توجد طلبات مسلمة.</div>';
+  const by={};delivered.forEach(o=>by[o.province]=(by[o.province]||0)+Number(o.total||0));
+  $("provinceRevenue").innerHTML=Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([p,v])=>`<div class="order-card"><b>${p}</b><div style="color:#777">${v} ج</div></div>`).join("")||'<div class="notice">لا توجد بيانات.</div>';
+}
+function renderProducts(){
+  $("productCount").textContent=`${(state.products||[]).length} منتجات`;
+  $("newProductCategory").innerHTML=(state.categories||[]).map(c=>`<option>${c}</option>`).join("");
+  $("productsList").innerHTML=(state.products||[]).map((p,pi)=>`<div class="product-card">
+    <div class="form-row">
+      <div class="field"><label>اسم المنتج</label><input data-product-name="${pi}" value="${p.name}"></div>
+      <div class="field"><label>القسم</label><select data-product-category="${pi}">${state.categories.map(c=>`<option ${c===p.category?"selected":""}>${c}</option>`).join("")}</select></div>
+    </div>
+    <div class="field"><label>الوصف</label><textarea data-product-desc="${pi}">${p.desc||""}</textarea></div>
+    <div class="field"><label>تغيير الصورة</label><input type="file" accept="image/*" data-product-image="${pi}"></div>
+    <table class="variant-table"><thead><tr><th>الحجم</th><th>السعر</th><th>المخزون</th><th></th></tr></thead><tbody>${p.variants.map((v,vi)=>`<tr>
+      <td><input data-v-size="${pi}:${vi}" value="${v.size}"></td>
+      <td><input data-v-price="${pi}:${vi}" type="number" value="${v.price}"></td>
+      <td><input data-v-stock="${pi}:${vi}" type="number" value="${v.stock}"></td>
+      <td><button class="btn red" data-delete-variant="${pi}:${vi}">حذف</button></td>
+    </tr>`).join("")}</tbody></table>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">
+      <button class="btn" data-add-variant="${pi}">+ إضافة حجم</button>
+      <button class="btn gold" data-save-product="${pi}">حفظ المنتج</button>
+      <button class="btn red" data-delete-product="${pi}">حذف المنتج</button>
+    </div>
+  </div>`).join("");
+}
+function renderCategories(){
+  $("categoryList").innerHTML=(state.categories||[]).map((c,i)=>`<div class="category-row"><b>${c}</b><button class="btn red" data-delete-category="${i}">حذف</button></div>`).join("");
+}
+function renderCarriers(){
+  $("carrierList").innerHTML=(state.carriers||[]).map((c,ci)=>`<div class="carrier-card">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px">
+      <div><h3 style="margin:0">${c.name}</h3><small style="color:#777">${c.active?"مفعلة":"غير مفعلة"}</small></div>
+      <div style="display:flex;gap:6px"><button class="btn light" data-toggle-carrier="${ci}">${c.active?"تعطيل":"تفعيل"}</button><button class="btn red" data-delete-carrier="${ci}">حذف</button></div>
+    </div>
+    <div class="carrier-grid">
+      <div class="field"><label>اسم الشركة</label><input data-carrier-name="${ci}" value="${c.name}"></div>
+      <div class="field"><label>داخل بورسعيد</label><input data-carrier-inside="${ci}" type="number" value="${c.insidePortSaid}"></div>
+      <div class="field"><label>خارج بورسعيد</label><input data-carrier-outside="${ci}" type="number" value="${c.outsidePortSaid}"></div>
+    </div>
+    <button class="btn gold" data-save-carrier="${ci}">حفظ الشركة</button>
+    <hr style="border:0;border-top:1px solid #eee;margin:14px 0">
+    <div class="form-row">
+      <div class="field"><label>محافظة بسعر خاص</label><select data-override-province="${ci}">${GOVS.filter(g=>g!=="بورسعيد").map(g=>`<option>${g}</option>`).join("")}</select></div>
+      <div class="field"><label>السعر الخاص</label><input data-override-price="${ci}" type="number"></div>
+    </div>
+    <button class="btn" data-add-override="${ci}">إضافة / تحديث السعر الخاص</button>
+    <div style="margin-top:10px">${Object.entries(c.overrides||{}).map(([p,v])=>`<div class="override-row"><b>${p}</b><input type="number" value="${v}" data-override-input="${ci}:${p}"><div style="display:flex;gap:5px"><button class="btn light" data-save-override="${ci}:${p}">حفظ</button><button class="btn red" data-delete-override="${ci}:${p}">حذف</button></div></div>`).join("")||'<div style="color:#888;font-size:12px">لا توجد أسعار خاصة.</div>'}</div>
+  </div>`).join("");
+}
+function renderSettings(){$("viewModeNote").textContent=`العرض الافتراضي الحالي: ${state.defaultView==="grid"?"Grid — شبكي":"List — قائمة"}`;}
+function renderAll(){renderDashboard();renderOrders();renderRevenue();renderProducts();renderCategories();renderCarriers();renderSettings();showView(currentView);}
+
+function openModal(id){$("modalBg").classList.add("show");$(id).classList.add("show");}
+function closeModals(){$("modalBg").classList.remove("show");document.querySelectorAll(".modal").forEach(m=>m.classList.remove("show"));}
+function showOrder(id){
+  const o=(state.orders||[]).find(x=>x.id===id);if(!o)return;
+  $("orderModalTitle").textContent=`تفاصيل الطلب ${o.id}`;
+  $("orderModalBody").innerHTML=`<div class="grid two">
+    <div class="order-card"><b>العميل</b><div style="margin-top:6px">${o.customer}<br>${o.phone}<br>${o.address}<br>${o.province}</div></div>
+    <div class="order-card"><b>الشحن</b><div style="margin-top:6px">${carrierName(o.carrierId)}<br>تكلفة الشحن: ${o.shipping} ج<br>الحالة: ${o.status}</div></div>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>المنتج</th><th>الحجم</th><th>الكمية</th><th>القيمة</th></tr></thead><tbody>${o.items.map(i=>`<tr><td>${i.name}</td><td>${i.size}</td><td>${i.qty}</td><td>${i.price*i.qty} ج</td></tr>`).join("")}</tbody></table></div>
+  <h3>الإجمالي: ${o.total} ج</h3>`;
+  openModal("orderModal");
+}
+function readFileAsDataURL(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});}
+
+document.addEventListener("click",async e=>{
+  const viewBtn=e.target.closest("[data-view]");if(viewBtn){showView(viewBtn.dataset.view);return;}
+  const jump=e.target.closest("[data-jump]");if(jump){showView(jump.dataset.jump);return;}
+  const details=e.target.closest("[data-order-details]");if(details){showOrder(details.dataset.orderDetails);return;}
+  const saveProd=e.target.closest("[data-save-product]");
+  if(saveProd){
+    const pi=Number(saveProd.dataset.saveProduct),p=state.products[pi];
+    p.name=document.querySelector(`[data-product-name="${pi}"]`).value.trim();
+    p.category=document.querySelector(`[data-product-category="${pi}"]`).value;
+    p.desc=document.querySelector(`[data-product-desc="${pi}"]`).value.trim();
+    p.variants.forEach((v,vi)=>{v.size=document.querySelector(`[data-v-size="${pi}:${vi}"]`).value.trim();v.price=Number(document.querySelector(`[data-v-price="${pi}:${vi}"]`).value||0);v.stock=Number(document.querySelector(`[data-v-stock="${pi}:${vi}"]`).value||0);});
+    const img=document.querySelector(`[data-product-image="${pi}"]`).files[0];if(img)p.image=await readFileAsDataURL(img);
+    saveState("تم حفظ تعديلات المنتج");return;
+  }
+  const addVar=e.target.closest("[data-add-variant]");if(addVar){state.products[Number(addVar.dataset.addVariant)].variants.push({size:"50 ml",price:0,stock:0});renderProducts();return;}
+  const delVar=e.target.closest("[data-delete-variant]");if(delVar){const [pi,vi]=delVar.dataset.deleteVariant.split(":").map(Number);if(state.products[pi].variants.length<=1){alert("لازم يفضل حجم واحد على الأقل");return;}state.products[pi].variants.splice(vi,1);saveState("تم حذف الحجم");return;}
+  const delProd=e.target.closest("[data-delete-product]");if(delProd&&confirm("حذف المنتج؟")){state.products.splice(Number(delProd.dataset.deleteProduct),1);saveState("تم حذف المنتج");return;}
+  const delCat=e.target.closest("[data-delete-category]");if(delCat){state.categories.splice(Number(delCat.dataset.deleteCategory),1);saveState("تم حذف القسم");return;}
+  const saveCarrier=e.target.closest("[data-save-carrier]");if(saveCarrier){const ci=Number(saveCarrier.dataset.saveCarrier),c=state.carriers[ci];c.name=document.querySelector(`[data-carrier-name="${ci}"]`).value.trim();c.insidePortSaid=Number(document.querySelector(`[data-carrier-inside="${ci}"]`).value||0);c.outsidePortSaid=Number(document.querySelector(`[data-carrier-outside="${ci}"]`).value||0);saveState("تم حفظ شركة الشحن");return;}
+  const toggleCarrier=e.target.closest("[data-toggle-carrier]");if(toggleCarrier){state.carriers[Number(toggleCarrier.dataset.toggleCarrier)].active=!state.carriers[Number(toggleCarrier.dataset.toggleCarrier)].active;saveState("تم تحديث حالة شركة الشحن");return;}
+  const delCarrier=e.target.closest("[data-delete-carrier]");if(delCarrier&&confirm("حذف شركة الشحن؟")){state.carriers.splice(Number(delCarrier.dataset.deleteCarrier),1);saveState("تم حذف شركة الشحن");return;}
+  const addOverride=e.target.closest("[data-add-override]");if(addOverride){const ci=Number(addOverride.dataset.addOverride),c=state.carriers[ci],p=document.querySelector(`[data-override-province="${ci}"]`).value,v=Number(document.querySelector(`[data-override-price="${ci}"]`).value||0);if(!v){alert("اكتب السعر");return;}c.overrides=c.overrides||{};c.overrides[p]=v;saveState("تم حفظ السعر الخاص");return;}
+  const saveOverride=e.target.closest("[data-save-override]");if(saveOverride){const [ci,p]=saveOverride.dataset.saveOverride.split(":");state.carriers[Number(ci)].overrides[p]=Number(document.querySelector(`[data-override-input="${ci}:${p}"]`).value||0);saveState("تم تحديث السعر الخاص");return;}
+  const delOverride=e.target.closest("[data-delete-override]");if(delOverride){const [ci,p]=delOverride.dataset.deleteOverride.split(":");delete state.carriers[Number(ci)].overrides[p];saveState("تم حذف السعر الخاص");return;}
+  const mode=e.target.closest("[data-default-view]");if(mode){state.defaultView=mode.dataset.defaultView;saveState("تم تغيير طريقة العرض الافتراضية");return;}
+});
+document.addEventListener("change",e=>{if(e.target.matches("[data-order-status]")){const o=state.orders.find(x=>x.id===e.target.dataset.orderStatus);o.status=e.target.value;saveState("تم تحديث حالة الطلب");}});
+$("orderSearch").addEventListener("input",renderOrders);$("statusFilter").addEventListener("change",renderOrders);$("carrierFilter").addEventListener("change",renderOrders);
+
+$("addProductBtn").addEventListener("click",async()=>{
+  const name=$("newProductName").value.trim(),desc=$("newProductDesc").value.trim(),category=$("newProductCategory").value,size=$("newProductSize").value.trim(),price=Number($("newProductPrice").value||0),stock=Number($("newProductStock").value||0);
+  if(!name||!size||!price){alert("أدخل الاسم والحجم والسعر");return;}
+  let image="";const file=$("newProductImage").files[0];if(file)image=await readFileAsDataURL(file);
+  state.products.push({id:Date.now(),name,desc,category,image,variants:[{size,price,stock}]});
+  ["newProductName","newProductDesc","newProductSize","newProductPrice","newProductStock"].forEach(id=>$(id).value="");$("newProductImage").value="";
+  saveState("تمت إضافة المنتج");
+});
+$("addCategoryBtn").addEventListener("click",()=>{const v=$("newCategoryName").value.trim();if(v&&!state.categories.includes(v)){state.categories.push(v);$("newCategoryName").value="";saveState("تمت إضافة القسم");}});
+$("openCarrierModalBtn").addEventListener("click",()=>openModal("carrierModal"));
+$("closeCarrierModalBtn").addEventListener("click",closeModals);$("closeOrderModalBtn").addEventListener("click",closeModals);$("modalBg").addEventListener("click",closeModals);
+$("addCarrierBtn").addEventListener("click",()=>{const name=$("carrierNameInput").value.trim(),inside=Number($("carrierInsideInput").value||0),outside=Number($("carrierOutsideInput").value||0);if(!name){alert("اكتب اسم شركة الشحن");return;}state.carriers.push({id:"c"+Date.now(),name,active:true,insidePortSaid:inside,outsidePortSaid:outside,overrides:{}});if(!state.defaultCarrierId)state.defaultCarrierId=state.carriers[0].id;$("carrierNameInput").value="";$("carrierInsideInput").value="";$("carrierOutsideInput").value="";closeModals();saveState("تمت إضافة شركة الشحن");});
+$("resetBtn").addEventListener("click",()=>{if(confirm("استرجاع البيانات الافتراضية الافتراضية؟")){state=clone(DEFAULT_STATE);storageSet(JSON.stringify(state));renderAll();toast("تم استرجاع البيانات الافتراضية");}});
+
+renderAll();
+window.addEventListener("storage",()=>{state=loadState();renderAll();});
+</script>
+</body>
+</html>

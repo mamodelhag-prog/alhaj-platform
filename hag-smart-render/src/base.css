@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap');
+
+:root {
+  /* Overlay layers */
+  --z-overlay: 400;
+
+  --z-spotlight: 1000; /* Tutorial spotlights/guided help */
+
+  /* System layers */
+  --z-critical: 2000; /* Critical system notifications */
+
+  /* spacing */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+}
+
+:root {
+  --background: #f3f6fb;
+  --foreground: #102039;
+  --surface: #eaf0f8;
+  --surface-foreground: #102039;
+  --sidebar: #0a1730;
+  --sidebar-foreground: #f4f8ff;
+  --card: #fbfdff;
+  --card-foreground: #102039;
+  --popup: #fbfdff;
+  --popup-foreground: #102039;
+  --primary: #1573ff;
+  --primary-foreground: #ffffff;
+  --secondary: #dfe9f7;
+  --secondary-foreground: #173456;
+  --accent: #e6c27f;
+  --accent-foreground: #1b2432;
+  --muted: #e6edf6;
+  --muted-foreground: #65758a;
+  --success: #1f9d6a;
+  --success-foreground: #ffffff;
+  --error: #d9535f;
+  --error-foreground: #ffffff;
+  --warning: #d89c32;
+  --warning-foreground: #1f2430;
+  --info: #2f8cff;
+  --info-foreground: #ffffff;
+  --info-hover: #1979ee;
+  --info-active: #0d66d7;
+  --border: #d9e3f0;
+  --font-family-base: 'Manrope', system-ui, sans-serif;
+  --font-family-display: 'Playfair Display', serif;
+  --font-family-monospace: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-family-cursive: cursive;
+  --shadow: 0 8px 22px rgba(12, 32, 60, 0.08);
+  --shadow-md: 0 16px 38px rgba(10, 29, 56, 0.12);
+  --shadow-lg: 0 24px 64px rgba(7, 22, 45, 0.16);
+  --shadow-focus: 0 0 0 3px rgba(21, 115, 255, 0.2);
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-full: 999px;
+  --animation-duration-fast: 120ms;
+  --animation-duration-normal: 220ms;
+  --animation-duration-slow: 420ms;
+  --chart-color-1: #1573ff;
+  --chart-color-2: #56c2ff;
+  --chart-color-3: #e6c27f;
+  --chart-color-4: #49a884;
+  --chart-color-5: #7e67d8;
+}
+
+.dark {
+  --background: #07111f;
+  --foreground: #f3f7fd;
+  --surface: #0d1c31;
+  --surface-foreground: #f3f7fd;
+  --sidebar: #06101d;
+  --sidebar-foreground: #f3f7fd;
+  --card: #10213a;
+  --card-foreground: #f3f7fd;
+  --popup: #10213a;
+  --popup-foreground: #f3f7fd;
+  --primary: #3195ff;
+  --primary-foreground: #ffffff;
+  --secondary: #172a45;
+  --secondary-foreground: #dce9fb;
+  --accent: #e6c27f;
+  --accent-foreground: #172133;
+  --muted: #14263f;
+  --muted-foreground: #9eb0c7;
+  --success: #45b887;
+  --success-foreground: #06120d;
+  --error: #f0737d;
+  --error-foreground: #25070a;
+  --warning: #e4ad4d;
+  --warning-foreground: #221706;
+  --info: #4aa6ff;
+  --info-foreground: #06111e;
+  --info-hover: #3694ea;
+  --info-active: #247fd1;
+  --border: #203653;
+  --chart-color-1: #4aa6ff;
+  --chart-color-2: #72d1ff;
+  --chart-color-3: #efcb8a;
+  --chart-color-4: #66c49f;
+  --chart-color-5: #9b87eb;
+}
+
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0}button,input,textarea{font:inherit}img{max-width:100%;display:block}
